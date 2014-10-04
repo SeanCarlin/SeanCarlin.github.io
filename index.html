@@ -11,12 +11,15 @@
 		<div class="container">
 			<div class="content">
 				<p>SEANCARLIN</p>
+
 				<div class="menuButton">
-					<span class="line1"></span>
-					<span class="line2"></span>
-					<span class="line3"></span>
+					<p>&#9776;</p>
 				</div>
-				<div class="menuButtonMask"></div>
+				<div class="menu">
+					<a href="#">Home</a>
+					<a href="#">Contact</a>
+					<a href="#">Social</a>
+				</div>
 				<svg width="640" height="480" xmlns="http://www.w3.org/2000/svg" xmlns:svg="http://www.w3.org/2000/svg">
 				 <g>
 				  <circle fill="none" stroke="#ffffff" stroke-width="10" stroke-dasharray="null" stroke-linejoin="null" stroke-linecap="null" cx="311" cy="228" r="207.62466" id="svg_1"/>
@@ -25,6 +28,13 @@
 				</svg>
 			</div>
 		</div>
-	</header>		
+	</header>	
+
+	<script src="http://ajax.googleapis.com/ajax/libs/jquery/2.1.1/jquery.min.js"></script>
+	<script>
+		$(".menuButton").bind("click", function(){
+			$(".menu").toggleClass("menuOpen");
+		});
+	</script>
 </body>
 </html>
