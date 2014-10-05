@@ -4,7 +4,9 @@
 	<meta charset="UTF-8">
 	<meta name="viewport" content="width=device-width, initial-scale=1">
 	<title>Sean Carlin</title>
+	<link href='http://fonts.googleapis.com/css?family=Open+Sans:400,300' rel='stylesheet' type='text/css'>
 	<link rel="stylesheet" href="css/main.css">
+	<link rel="stylesheet" href="css/animate.css">
 </head>
 <body>
 	<header>
@@ -16,16 +18,10 @@
 					<p>&equiv;</p>
 				</div>
 				<div class="menu">
-					<a href="#">Home</a>
-					<a href="#">Contact</a>
-					<a href="#">Social</a>
+					<a href="#" class="animated">Home</a>
+					<a href="#" class="animated">Contact</a>
+					<a href="#" class="animated">Social</a>
 				</div>
-				<svg width="640" height="480" xmlns="http://www.w3.org/2000/svg" xmlns:svg="http://www.w3.org/2000/svg">
-				 <g>
-				  <circle fill="none" stroke="#ffffff" stroke-width="10" stroke-dasharray="null" stroke-linejoin="null" stroke-linecap="null" cx="311" cy="228" r="207.62466" id="svg_1"/>
-				  <circle fill="#258BEF" stroke="#ffffff" stroke-width="10" stroke-dasharray="null" stroke-linejoin="null" stroke-linecap="null" cx="476" cy="104" r="58.5235" id="svg_2"/>
-				 </g>
-				</svg>
 			</div>
 		</div>
 	</header>	
@@ -34,6 +30,9 @@
 	<script>
 		$(".menuButton").bind("click", function(){
 			$(".menu").toggleClass("menuOpen");
+			$(".menu a:first-child").toggleClass("fadeInLeft");
+			setTimeout(function(){$(".menu a:nth-child(2)").toggleClass("fadeInLeft");}, 50);
+			setTimeout(function(){$(".menu a:nth-child(3)").toggleClass("fadeInLeft");}, 100);
 		});
 	</script>
 </body>
