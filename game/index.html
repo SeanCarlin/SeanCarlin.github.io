@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<!--
+Created using JS Bin
+http://jsbin.com
+
+Copyright (c) 2015 by anonymous (http://jsbin.com/gatowovata/2/edit)
+
+Released under the MIT license: http://jsbin.mit-license.org
+-->
+<meta name="robots" content="noindex">
+<html>
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Game</title>
+<style id="jsbin-css">
+body { margin: 0; }
+
+canvas { display: block; background: black;}
+</style>
+</head>
+<body>
+  <canvas id="c"></canvas>
+<script id="jsbin-javascript">
+var ctx = c.getContext("2d"),
+		W = innerWidth,
+		H = innerHeight,
+		gameHeight = 543,
+		borderHeight = (H - gameHeight)/2;
+
+c.width = W;
+c.height = H;
+
+ctx.fillStyle = "white";
+ctx.font = "50px Arial";
+
+var player, keyDown, obstacles, n, score, speed = 3;
+
+function init(){
+	player = {
+		size: 20,
+		x: 200,
+		y: c.height / 2 - 10
+	};
+	keyDown = false;
+	obstacles = [];
+	n = 0;
+	score = 0;
+}
+
+function draw(){
+	var i;
+	ctx.clearRect(0,0,c.width,c.height);
+  ctx.fillRect(player.x, player.y, player.size, player.size);
+	ctx.fillRect(0,0,c.width,(H-gameHeight)/2);
+	ctx.fillRect(0,c.height-(H-gameHeight)/2,c.width,(H-gameHeight)/2);
+	ctx.fillText(score, c.width - 70, borderHeight + 50);
+	for (i = 0; i < n; i++)
+	  ctx.fillRect(obstacles[i].x, obstacles[i].y, 20, 250);
+}
+
+function update(){
+	var i, obst;
+	if (keyDown)
+		player.y -= speed;
+	else
+		player.y += speed;
+	
+	if (player.y + 20> c.height - borderHeight || player.y < borderHeight)
+		return init();
+	
+	for (i = 0; i < n; i++){
+		obst = obstacles[i];
+		obst.x-=7 ;
+		if (obst.x < -20){
+			obstacles.splice(i, i+1);
+			n--;
+		}
+		
+		if (player.x + 20 > obst.x && player.x + 20 < obst.x + 20 && player.y + 20 > obst.y && player.y < obst.y + 250){
+			obstacles.splice(0, obstacles.length);
+			return init();
+		}
+		
+		if (player.x > obst.x + 20 && player.x < obst.x + 27)
+			score++;
+		
+	}
+}
+
+function main(){
+	update();
+	draw();
+	requestAnimationFrame(main);
+}
+
+function createObstacles(){
+	n++;
+	obstacles.push({
+		x: c.width,
+		y: borderHeight + Math.floor(Math.random() * (gameHeight - 250))
+	});
+}
+
+addEventListener("keydown", function(){ keyDown = true; });
+addEventListener("keyup", function(){ keyDown = false; });
+
+setInterval(createObstacles, 1500);
+
+init(); 
+main();
+
+</script>
+</body>
+</html>
