@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Barriers - A HTML5 Canvas Game</title>
+  <meta name="description" content="Avoid the barriers at all costs! Built using HTML5 Canvas and JavaScript.">
+<style>
+
+	body { margin: 0; }
+	canvas { display: block; background: black;}
+
+</style>
+</head>
+<body>
+  <canvas id="c"></canvas>
+	<script>
+
+	var ctx = c.getContext("2d"),
+		W = innerWidth,
+		H = innerHeight,
+		gameHeight = 543,
+		borderHeight = (H - gameHeight)/2,
+		barrierHeight = 160;
+
+	c.width = W;
+	c.height = H;
+
+	ctx.fillStyle = "white";
+	ctx.font = "50px Arial";
+
+	var player, keyDown, barriers, n, score, playerSpeed = 3, barrierSpeed = 4;
+
+	function init(){
+		player = {
+			size: 20,
+			x: 200,
+			y: c.height / 2 - 10
+		};
+		active = false;
+		barriers = [];
+		n = 0;
+		score = 0;
+	}
+
+	function draw(){
+		var i, barrier;
+		ctx.clearRect(0,0,c.width,c.height);
+	  	ctx.fillRect(player.x, player.y, player.size, player.size);
+		ctx.fillRect(0,0,c.width,(H-gameHeight)/2);
+		ctx.fillRect(0,c.height-(H-gameHeight)/2,c.width,(H-gameHeight)/2);
+		ctx.fillText(score, c.width - 70, borderHeight + 50);
+
+		for (i = 0; i < n; i++){
+			barrier = barriers[i];
+			ctx.fillRect(barrier.x, barrier.y, 20, barrierHeight);
+		}
+	}
+
+	function update(){
+		var i, barrier;
+		if (active)
+			player.y -= playerSpeed;
+		else
+			player.y += playerSpeed;
+		
+		if (player.y + 20> c.height - borderHeight || player.y < borderHeight)
+			return init();
+		
+		for (i = 0; i < n; i++){
+			barrier = barriers[i];
+			barrier.x-=7 ;
+			if (barrier.x < -20){
+				barriers.splice(i, i+1);
+				n--;
+			}
+			
+			if (player.x + 20 > barrier.x && player.x + 20 < barrier.x + 20 && player.y + 20 > barrier.y && player.y < barrier.y + barrierHeight){
+				barriers.splice(0, barriers.length);
+				return init();
+			}
+			
+			if (player.x > barrier.x + 20 && player.x < barrier.x + 27)
+				score++;
+
+			if (barrier.y + barrierHeight >= H - borderHeight)
+				barrier.vy = -Math.abs(barrier.vy);
+
+			if (barrier.y <= borderHeight)
+				barrier.vy = Math.abs(barrier.vy);
+			
+			barrier.y += barrier.vy;
+		}
+	}
+
+	function main(){
+		update();
+		draw();
+		requestAnimationFrame(main);
+	}
+
+	function createBarriers(){
+		n++;
+		barriers.push({
+			x: c.width,
+			y: borderHeight + Math.floor(Math.random() * (gameHeight - barrierHeight)),
+			vy: Math.random() > 0.5 ? barrierSpeed : -Math.abs(barrierSpeed)
+		});
+	}
+
+	addEventListener("keydown", function(){ active = true; });
+	addEventListener("keyup", function(){ active = false; });
+
+	addEventListener("mousedown", function(){ active = true; });
+	addEventListener("mouseup", function(){ active = false; });
+
+	addEventListener("touchstart", function(){ active = true; });
+	addEventListener("touchend", function(){ active = false; });
+
+	setInterval(createBarriers, 1000);
+
+	init(); 
+	main();
+
+</script>
+</body>
+</html>
