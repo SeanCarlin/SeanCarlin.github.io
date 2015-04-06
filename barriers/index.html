@@ -2,17 +2,16 @@
 <html>
 <head>
   <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Barriers - A HTML5 Canvas Game</title>
   <meta name="description" content="Avoid the barriers at all costs! Built using HTML5 Canvas and JavaScript.">
 <style>
 
 	body { margin: 0; }
-	canvas { display: block; background: black;}
+	canvas { display: block; }
 
 </style>
 </head>
-<body>
+<body id="body">
   <canvas id="c"></canvas>
 	<script>
 
@@ -26,10 +25,9 @@
 	c.width = W;
 	c.height = H;
 
-	ctx.fillStyle = "white";
 	ctx.font = "50px Arial";
 
-	var player, keyDown, barriers, n, score, playerSpeed = 3, barrierSpeed = 4;
+	var player, active, barriers, n, score, playerSpeed = 3, barrierSpeed = 4;
 
 	function init(){
 		player = {
@@ -45,6 +43,7 @@
 
 	function draw(){
 		var i, barrier;
+
 		ctx.clearRect(0,0,c.width,c.height);
 	  	ctx.fillRect(player.x, player.y, player.size, player.size);
 		ctx.fillRect(0,0,c.width,(H-gameHeight)/2);
@@ -59,8 +58,10 @@
 
 	function update(){
 		var i, barrier;
+
 		if (active)
 			player.y -= playerSpeed;
+
 		else
 			player.y += playerSpeed;
 		
@@ -68,6 +69,8 @@
 			return init();
 		
 		for (i = 0; i < n; i++){
+
+
 			barrier = barriers[i];
 			barrier.x-=7 ;
 			if (barrier.x < -20){
@@ -75,7 +78,7 @@
 				n--;
 			}
 			
-			if (player.x + 20 > barrier.x && player.x + 20 < barrier.x + 20 && player.y + 20 > barrier.y && player.y < barrier.y + barrierHeight){
+			if (player.x + 20 > barrier.x && player.x < barrier.x + 20 && player.y + 20 > barrier.y && player.y < barrier.y + barrierHeight){
 				barriers.splice(0, barriers.length);
 				return init();
 			}
@@ -90,6 +93,8 @@
 				barrier.vy = Math.abs(barrier.vy);
 			
 			barrier.y += barrier.vy;
+
+
 		}
 	}
 
@@ -108,6 +113,8 @@
 		});
 	}
 
+	setInterval(createBarriers, 1000);
+
 	addEventListener("keydown", function(){ active = true; });
 	addEventListener("keyup", function(){ active = false; });
 
@@ -116,8 +123,6 @@
 
 	addEventListener("touchstart", function(){ active = true; });
 	addEventListener("touchend", function(){ active = false; });
-
-	setInterval(createBarriers, 1000);
 
 	init(); 
 	main();
