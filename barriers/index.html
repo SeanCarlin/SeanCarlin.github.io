@@ -15,7 +15,7 @@
 <body id="body">
   <canvas id="c"></canvas>
 	<script>
-
+	// Initialising variables
 	var ctx = c.getContext("2d"),
 		W = innerWidth,
 		H = innerHeight,
@@ -23,14 +23,17 @@
 		borderHeight = (H - gameHeight)/2,
 		barrierHeight = 160;
 
+	// Setting canvas dimensions
 	c.width = W;
 	c.height = H;
 
-	ctx.font = "50px Arial";
+	// Some more variables
+	var player, active, barriers, n, score, highScore = 0, playerSpeed = 3, barrierSpeed = 4, frames = 0, tries = 0, running;
 
-	var player, active, barriers, n, score, playerSpeed = 3, barrierSpeed = 4;
-
+	// Restores all variables
 	function init(){
+		ctx.fillStyle = "black";
+		ctx.font = "50px Arial";
 		player = {
 			size: 20,
 			x: 200,
@@ -40,8 +43,10 @@
 		barriers = [];
 		n = 0;
 		score = 0;
+		running = true;
 	}
 
+	// Draws to the canvas
 	function draw(){
 		var i, barrier;
 
@@ -57,6 +62,7 @@
 		}
 	}
 
+	// Updates coordinates, determines score and detects collisions
 	function update(){
 		var i, barrier;
 
@@ -66,8 +72,18 @@
 		else
 			player.y += playerSpeed;
 		
-		if (player.y + 20> c.height - borderHeight || player.y < borderHeight)
-			return init();
+		if (player.y + 20> c.height - borderHeight || player.y < borderHeight){
+			barriers.splice(0, barriers.length);
+			highScore = score > highScore ? score : highScore;
+			tries++;
+			if (tries === 3){
+				tries = 0;
+				running = false;
+				gameOver();
+			} else {
+				return init();
+			}
+		}
 		
 		for (i = 0; i < n; i++){
 
@@ -81,7 +97,15 @@
 			
 			if (player.x + 20 > barrier.x && player.x < barrier.x + 20 && player.y + 20 > barrier.y && player.y < barrier.y + barrierHeight){
 				barriers.splice(0, barriers.length);
-				return init();
+				highScore = score > highScore ? score : highScore;
+				tries++;
+				if (tries === 3){
+					tries = 0;
+					running = false;
+					gameOver();
+				} else {
+					return init();
+				}
 			}
 			
 			if (player.x > barrier.x + 20 && player.x < barrier.x + 27)
@@ -99,12 +123,7 @@
 		}
 	}
 
-	function main(){
-		update();
-		draw();
-		requestAnimationFrame(main);
-	}
-
+	// Creates a barrier
 	function createBarriers(){
 		n++;
 		barriers.push({
@@ -114,8 +133,31 @@
 		});
 	}
 
-	setInterval(createBarriers, 1000);
+	// Displays after 3 tries
+	function gameOver(){
+		ctx.fillRect(0,0,c.width,c.height);
+		ctx.fillStyle = "white";
+		ctx.fillText("Game Over.", 150, H / 2 - 15);
+		ctx.font = "16px Arial";
+		ctx.fillText("Your High Score was: " + highScore, 160, H / 2 + 30);
+		highScore = 0;
+		setTimeout(function(){ ctx.clearRect(0,0,c.width,c.height); init(); main(); return; }, 3000);
+	}
 
+	// The main program
+	function main(){
+		if (running){
+			frames++;
+			if (frames === 60) { frames = 0; createBarriers(); }
+			update();
+			draw();
+			requestAnimationFrame(main);
+		} else {
+			return;
+		}
+	}
+
+	// Event Listeners
 	addEventListener("keydown", function(){ active = true; });
 	addEventListener("keyup", function(){ active = false; });
 
@@ -125,6 +167,7 @@
 	addEventListener("touchstart", function(){ active = true; });
 	addEventListener("touchend", function(){ active = false; });
 
+	// Houston, we have lift-off.
 	init(); 
 	main();
 
