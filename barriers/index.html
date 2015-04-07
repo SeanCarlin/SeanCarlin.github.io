@@ -28,11 +28,22 @@
 	c.height = H;
 
 	// Some more variables
-	var player, active, barriers, n, score, highScore = 0, playerSpeed = 3, barrierSpeed = 4, frames = 0, tries = 0, running;
+	var player,
+		active,
+		barriers,
+		n,
+		score,
+		highScore = 0,
+		playerSpeed = 3,
+		barrierSpeed = 4,
+		frames = 0,
+		tries = 0,
+		running,
+		color = "#00FF92";
 
 	// Restores all variables
 	function init(){
-		ctx.fillStyle = "black";
+		ctx.fillStyle = color;
 		ctx.font = "50px Arial";
 		player = {
 			size: 20,
@@ -48,18 +59,21 @@
 
 	// Draws to the canvas
 	function draw(){
-		var i, barrier;
+		if (running){
+			var i, barrier;
 
-		ctx.clearRect(0,0,c.width,c.height);
-	  	ctx.fillRect(player.x, player.y, player.size, player.size);
-		ctx.fillRect(0,0,c.width,(H-gameHeight)/2);
-		ctx.fillRect(0,c.height-(H-gameHeight)/2,c.width,(H-gameHeight)/2);
-		ctx.fillText(score, c.width - 70, borderHeight + 50);
+			ctx.clearRect(0,0,c.width,c.height);
+		  	ctx.fillRect(player.x, player.y, player.size, player.size);
+			ctx.fillRect(0,0,c.width,(H-gameHeight)/2);
+			ctx.fillRect(0,c.height-(H-gameHeight)/2,c.width,(H-gameHeight)/2);
+			ctx.fillText(score, c.width - 70, borderHeight + 50);
 
-		for (i = 0; i < n; i++){
-			barrier = barriers[i];
-			ctx.fillRect(barrier.x, barrier.y, 20, barrierHeight);
-		}
+			for (i = 0; i < n; i++){
+				barrier = barriers[i];
+				ctx.fillRect(barrier.x, barrier.y, 20, barrierHeight);
+			}
+		} else
+			return;
 	}
 
 	// Updates coordinates, determines score and detects collisions
@@ -80,6 +94,7 @@
 				tries = 0;
 				running = false;
 				gameOver();
+				return;
 			} else {
 				return init();
 			}
@@ -103,6 +118,7 @@
 					tries = 0;
 					running = false;
 					gameOver();
+					return;
 				} else {
 					return init();
 				}
@@ -133,7 +149,7 @@
 		});
 	}
 
-	// Displays after 3 tries
+	// Displays game over message after 3 tries
 	function gameOver(){
 		ctx.fillRect(0,0,c.width,c.height);
 		ctx.fillStyle = "white";
