@@ -39,7 +39,11 @@
 		frames = 0,
 		tries = 0,
 		running,
-		color = "#EC7357";
+		color = "#EC7357",
+		ding = new Audio("ding.mp3"),
+		ding2 = new Audio("ding2.mp3"),
+		death = new Audio("death.mp3"),
+		sound = true;
 
 	// Restores all variables
 	function init(){
@@ -80,14 +84,18 @@
 	function update(){
 		var i, barrier;
 
+		// Move up
 		if (active)
 			player.y -= playerSpeed;
 
+		// Move down
 		else
 			player.y += playerSpeed;
 		
+		// Detects collision with borders
 		if (player.y + 20> c.height - borderHeight || player.y < borderHeight){
 			barriers.splice(0, barriers.length);
+			death.play();
 			highScore = score > highScore ? score : highScore;
 			tries++;
 			if (tries === 3){
@@ -101,17 +109,21 @@
 		}
 		
 		for (i = 0; i < n; i++){
-
-
 			barrier = barriers[i];
-			barrier.x-=7 ;
+
+			// Moves barriers left
+			barrier.x-=7;
+
+			// Destroys barriers
 			if (barrier.x < -20){
 				barriers.splice(i, i+1);
 				n--;
 			}
 			
+			// Detects collision with barriers
 			if (player.x + 20 > barrier.x && player.x < barrier.x + 20 && player.y + 20 > barrier.y && player.y < barrier.y + barrierHeight){
 				barriers.splice(0, barriers.length);
+				death.play();
 				highScore = score > highScore ? score : highScore;
 				tries++;
 				if (tries === 3){
@@ -124,18 +136,23 @@
 				}
 			}
 			
-			if (player.x > barrier.x + 20 && player.x < barrier.x + 27)
+			// Detects if player passes barrier
+			if (player.x > barrier.x + 20 && player.x < barrier.x + 27){
 				score++;
+				if (sound) { ding.play(); sound = false; }
+				else { ding2.play(); sound = true; }
+			}
 
+			// Sets barrier direction to up
 			if (barrier.y + barrierHeight >= H - borderHeight)
 				barrier.vy = -Math.abs(barrier.vy);
 
+			// Sets barrier direction to down
 			if (barrier.y <= borderHeight)
 				barrier.vy = Math.abs(barrier.vy);
 			
+			// Moves barrier
 			barrier.y += barrier.vy;
-
-
 		}
 	}
 
@@ -153,7 +170,7 @@
 	function gameOver(){
 		ctx.fillRect(0,0,c.width,c.height);
 		ctx.fillStyle = "white";
-		ctx.fillText("Game Over.", 150, H / 2 - 15);
+		ctx.fillText("Game Over", 150, H / 2 - 15);
 		ctx.font = "16px Arial";
 		ctx.fillText("Your High Score was: " + highScore, 160, H / 2 + 30);
 		highScore = 0;
