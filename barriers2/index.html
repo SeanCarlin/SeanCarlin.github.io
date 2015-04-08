@@ -147,7 +147,7 @@
 			}
 			
 			// Detects if player passes barrier
-			if (player.x > barrier.x + 20 && player.x < barrier.x + 27){
+			if (player.x > barrier.x + 20 && player.x < barrier.x + 20 + horizontalBarrierSpeed){
 				score++;
 				if (sound) { ding.play(); sound = false; }
 				else { ding2.play(); sound = true; }
