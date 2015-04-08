@@ -1,0 +1,224 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>Barriers - A HTML5 Canvas Game</title>
+  <meta name="description" content="Avoid the barriers at all costs! Built using HTML5 Canvas and JavaScript.">
+  <meta name="viewport" content="user-scalable=no">
+<style>
+
+	body { margin: 0; }
+	canvas { display: block; }
+
+</style>
+</head>
+<body id="body">
+  <canvas id="c"></canvas>
+	<script>
+
+	// Initialising variables
+	var n,
+		score,
+		player,
+		active,
+		running,
+		barriers,
+		tries = 0,
+		frames = 0,
+		gravity = 3,
+		sound = true,
+		highScore = 0,
+		W = innerWidth,
+		H = innerHeight,
+		playerSpeed = 5,
+		gameHeight = 543,
+		barrierHeight = 200,
+		verticalBarrierSpeed = 4,
+		ctx = c.getContext("2d"),
+		horizontalBarrierSpeed = 8,
+		gravityAcceleration = 1.02,
+		ding = new Audio("ding.mp3"),
+		ding2 = new Audio("ding2.mp3"),
+		death = new Audio("death.mp3"),
+		playerSpeedDeceleration = 0.975,
+		borderHeight = (H - gameHeight)/2,
+		colors = ["#BFFF00", "#42FFCB", "#FF637D"];
+
+	// Setting canvas dimensions
+	c.width = W;
+	c.height = H; 
+
+	// Restores all variables
+	function init(){
+		ctx.fillStyle = colors[Math.floor(Math.random() * colors.length)];
+		ctx.font = "50px Arial";
+		player = {
+			size: 20,
+			x: 200,
+			y: c.height / 2 - 10
+		};
+		active = false;
+		barriers = [];
+		n = 0;
+		score = 0;
+		running = true;
+		gravity = 3;
+	}
+
+	// Draws to the canvas
+	function draw(){
+		if (running){
+			var i, barrier;
+
+			ctx.clearRect(0,0,c.width,c.height);
+		  	ctx.fillRect(player.x, player.y, player.size, player.size);
+			ctx.fillRect(0,0,c.width,(H-gameHeight)/2);
+			ctx.fillRect(0,c.height-(H-gameHeight)/2,c.width,(H-gameHeight)/2);
+			ctx.fillText(score, c.width - 70, borderHeight + 50);
+
+			for (i = 0; i < n; i++){
+				barrier = barriers[i];
+				ctx.fillRect(barrier.x, barrier.y, 20, barrierHeight);
+			}
+		} else
+			return;
+	}
+
+	// Updates coordinates, determines score and detects collisions
+	function update(){
+		var i, barrier;
+
+		// Move up
+		if (active){
+			player.y -= playerSpeed;
+			gravity = 3;
+		}
+
+		// Move down
+		else {
+			gravity *= gravityAcceleration;
+			playerSpeed *= playerSpeedDeceleration;
+			player.y -= playerSpeed;
+			player.y += gravity;
+		}
+		
+		// Detects collision with borders
+		if (player.y + 20> c.height - borderHeight || player.y < borderHeight){
+			barriers.splice(0, barriers.length);
+			death.play();
+			highScore = score > highScore ? score : highScore;
+			tries++;
+			if (tries === 3){
+				tries = 0;
+				running = false;
+				gameOver();
+				return;
+			} else {
+				return init();
+			}
+		}
+		
+		for (i = 0; i < n; i++){
+			barrier = barriers[i];
+
+			// Moves barriers left
+			barrier.x-=horizontalBarrierSpeed;
+
+			// Destroys barriers
+			if (barrier.x < -20){
+				barriers.splice(i, i+1);
+				n--;
+			}
+			
+			// Detects collision with barriers
+			if (player.x + 20 > barrier.x && player.x < barrier.x + 20 && player.y + 20 > barrier.y && player.y < barrier.y + barrierHeight){
+				barriers.splice(0, barriers.length);
+				death.play();
+				highScore = score > highScore ? score : highScore;
+				tries++;
+				if (tries === 3){
+					tries = 0;
+					running = false;
+					gameOver();
+					return;
+				} else {
+					return init();
+				}
+			}
+			
+			// Detects if player passes barrier
+			if (player.x > barrier.x + 20 && player.x < barrier.x + 27){
+				score++;
+				if (sound) { ding.play(); sound = false; }
+				else { ding2.play(); sound = true; }
+			}
+
+			// Sets barrier direction to up
+			if (barrier.y + barrierHeight >= H - borderHeight)
+				barrier.vy = -Math.abs(barrier.vy);
+
+			// Sets barrier direction to down
+			if (barrier.y <= borderHeight)
+				barrier.vy = Math.abs(barrier.vy);
+			
+			// Moves barrier
+			barrier.y += barrier.vy;
+		}
+	}
+
+	// Creates a barrier
+	function createBarriers(){
+		n++;
+		barriers.push({
+			x: c.width,
+			y: borderHeight + Math.floor(Math.random() * (gameHeight - barrierHeight)),
+			vy: Math.random() > 0.5 ? verticalBarrierSpeed : -Math.abs(verticalBarrierSpeed)
+		});
+	}
+
+	// Displays game over message after 3 tries
+	function gameOver(){
+		ctx.fillRect(0,0,c.width,c.height);
+		ctx.fillStyle = "white";
+		ctx.fillText("Game Over", 150, H / 2 - 15);
+		ctx.font = "16px Arial";
+		ctx.fillText("Your High Score was: " + highScore, 160, H / 2 + 30);
+		highScore = 0;
+		setTimeout(function(){ ctx.clearRect(0,0,c.width,c.height); init(); main(); return; }, 3000);
+	}
+
+	function eventHandler(){
+		playerSpeed = 5;
+		active = true;
+		setTimeout(function(){
+			active = false;
+		}, 200);
+	}
+
+	// The main program
+	function main(){
+		if (running){
+			frames++;
+			if (frames === 60) { frames = 0; createBarriers(); }
+
+			update();
+			draw();
+			requestAnimationFrame(main);
+
+		} else {
+			return;
+		}
+	}
+
+	// Event Listeners
+	addEventListener("mousedown", eventHandler);
+	addEventListener("keydown", eventHandler);
+	addEventListener("touchstart", eventHandler);
+
+	// Houston, we have lift-off.
+	init(); 
+	main();
+
+</script>
+</body>
+</html>
