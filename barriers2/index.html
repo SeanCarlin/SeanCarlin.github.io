@@ -181,7 +181,7 @@
 		ctx.fillRect(0,0,c.width,c.height);
 		ctx.fillStyle = "white";
 		ctx.fillText("Game Over", 150, H / 2 - 15);
-		ctx.font = "16px Arial";
+		ctx.font = "30px Arial";
 		ctx.fillText("Your High Score was: " + highScore, 160, H / 2 + 30);
 		highScore = 0;
 		setTimeout(function(){ ctx.clearRect(0,0,c.width,c.height); init(); main(); return; }, 3000);
