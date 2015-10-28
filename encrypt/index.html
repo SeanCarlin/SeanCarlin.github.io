@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<!--
+Created using JS Bin
+http://jsbin.com
+
+Copyright (c) 2015 by SeanCarlin (http://jsbin.com/xeleri/1/edit)
+
+Released under the MIT license: http://jsbin.mit-license.org
+-->
+<meta name="robots" content="noindex">
+<html>
+<head>
+	<link href='https://fonts.googleapis.com/css?family=Lobster' rel='stylesheet' type='text/css'>
+  <meta charset="utf-8">
+  <title>JS Bin</title>
+<style id="jsbin-css">
+body {
+	margin: 0;
+}
+
+#title {
+  font-family: "Lobster";
+	padding: 20px 0;
+	background: #D7263D;
+	color: #fff;
+	margin: 0;
+	font-weight: 400;
+	font-size: 2em;
+}
+
+.container, .header {
+	width: 60%;
+	margin: 0 auto;
+}
+
+.container {
+	margin-top: 30px;
+}
+
+.col {
+	float: left;
+}
+
+.result {
+	width: 350px;
+	height: 250px;
+	padding: 20px;
+	margin: 10px;
+	border: 3px dashed #1B998B;
+	font-family: courier;
+	font-size: 13.333px;
+}
+
+form input, form textarea {
+	display: block;
+	margin: 10px;
+	padding: 10px;
+	font-family: courier;
+	border: 3px solid #2E294E;
+}
+
+form button {
+	margin: 0 0 0 10px;
+	font-family: courier;
+	background: #fff;
+	border: 3px solid #D7263D;
+	padding: 10px;
+	transition: 0.3s ease;
+}
+
+form button:hover {
+	cursor: pointer;
+	color: white;
+	background: #D7263D;
+}
+
+form input:focus, form textarea:focus, form button:focus {
+  outline: none;
+}
+</style>
+</head>
+<body>
+	<h3 id="title"><div class="header">Encrypt a Message</div></h3>
+	<div class="container">
+		<div class="col">
+		  <form action="javascript:void(0)">
+				<textarea name="message" placeholder="Enter some text you would like to encrypt/decrypt." cols="30" rows="10" id="textInput"></textarea>
+				 <input id="keyInput" placeholder="Enter a secret key.">
+				<button onclick="cipher(1)">Encrypt</button>
+				<button onclick="cipher(2)">Decrypt</button>
+			</form>
+		</div>
+	</div>
+	
+	<div class="col result" id="result"></div>
+<script id="jsbin-javascript">
+var chars = "aAbBcCdDeEfFgGhHiIjJkKlLmMnNoOpPqQrRsStTuUvVwWxXyYzZ1234567890 .,/:;".split(""),
+		textInput = document.getElementById("textInput"),
+		keyInput = document.getElementById("keyInput"),
+		resultDiv = document.getElementById("result");
+
+function cipher(s){
+	var newMessage = "", i,
+			m = textInput.value,
+			k = keyInput.value,
+			newLetter, letter, keyLetter, letterIndex;
+	
+	for (i = 0; i < m.length; i++){
+		letter = m[i];
+		keyLetter = k[i % k.length];
+		if (chars.indexOf(letter) !== -1){
+			if (s == 1){
+				newLetter = chars[(chars.indexOf(letter) + chars.indexOf(keyLetter)) % chars.length];
+				newMessage += newLetter;
+			}
+			if (s == 2){
+				letterIndex = chars.indexOf(letter) - chars.indexOf(keyLetter);
+				newLetter = chars[((letterIndex % chars.length)+chars.length) % chars.length];
+				newMessage += newLetter;
+			}
+		} else {
+			newMessage += letter;
+		}
+	}
+	
+	resultDiv.innerHTML = newMessage;
+}
+
+
+</script>
+</body>
+</html>
