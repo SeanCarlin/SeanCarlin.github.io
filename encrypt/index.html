@@ -110,6 +110,7 @@ function cipher(s){
 	try {
 		m = textInput.value;
 		k = keyInput.value;
+		if (!m && !k) throw "";
 		if (!m || !k) throw "Error - You must have a valid key and message.";
 		for (i = 0; i < m.length; i++){
 			letter = m[i];
@@ -138,9 +139,10 @@ function cipher(s){
 function genKey(){
 	var newKey = "", i;
 
-	for (i = 0; i < 8; i++){
+	for (i = 0; i < Math.floor(Math.random()*10)+5; i++){
 		newKey += chars[Math.floor(Math.random()*chars.length)]	
 	}
+
 	keyInput.value = newKey;
 }
 
