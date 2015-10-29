@@ -74,7 +74,7 @@ form input:focus, form textarea:focus, form button:focus {
   outline: none;
 }
 
-@media (max-width: 1000px){
+@media (max-width: 1160px){
 	.container, .header {
 		width: 90%;	
 	}
@@ -91,6 +91,7 @@ form input:focus, form textarea:focus, form button:focus {
 					<input id="keyInput" placeholder="Enter a secret key." autocomplete="off">
 					<button onclick="cipher(1)">Encrypt</button>
 					<button onclick="cipher(2)">Decrypt</button>
+					<button onclick="genKey()">Random Key</button>
 				</div>
 			</form>
 		</div>
@@ -134,6 +135,14 @@ function cipher(s){
 	resultDiv.innerHTML = newMessage;
 }
 
+function genKey(){
+	var newKey = "", i;
+
+	for (i = 0; i < 8; i++){
+		newKey += chars[Math.floor(Math.random()*chars.length)]	
+	}
+	keyInput.value = newKey;
+}
 
 </script>
 </body>
