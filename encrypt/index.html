@@ -1,19 +1,10 @@
 <!DOCTYPE html>
-<!--
-Created using JS Bin
-http://jsbin.com
-
-Copyright (c) 2015 by SeanCarlin (http://jsbin.com/xeleri/1/edit)
-
-Released under the MIT license: http://jsbin.mit-license.org
--->
-<meta name="robots" content="noindex">
 <html>
 <head>
 	<link href='https://fonts.googleapis.com/css?family=Lobster' rel='stylesheet' type='text/css'>
-  <meta charset="utf-8">
-  <title>JS Bin</title>
-<style id="jsbin-css">
+	<meta charset="utf-8">
+	<title>Encrypt a Message</title>
+<style>
 body {
 	margin: 0;
 }
@@ -29,12 +20,13 @@ body {
 }
 
 .container, .header {
-	width: 60%;
+	width: 50%;
 	margin: 0 auto;
 }
 
 .container {
 	margin-top: 30px;
+	clear: both;
 }
 
 .col {
@@ -42,30 +34,32 @@ body {
 }
 
 .result {
-	width: 350px;
 	height: 250px;
 	padding: 20px;
-	margin: 10px;
+	margin-top: 10px;
 	border: 3px dashed #1B998B;
 	font-family: courier;
 	font-size: 13.333px;
+	box-sizing: border-box;
 }
 
 form input, form textarea {
 	display: block;
 	margin: 10px;
+	margin-left: 0;
 	padding: 10px;
 	font-family: courier;
 	border: 3px solid #2E294E;
 }
 
 form button {
-	margin: 0 0 0 10px;
 	font-family: courier;
+	color: #D7263D;
 	background: #fff;
 	border: 3px solid #D7263D;
 	padding: 10px;
 	transition: 0.3s ease;
+	margin-bottom: 20px;
 }
 
 form button:hover {
@@ -77,6 +71,12 @@ form button:hover {
 form input:focus, form textarea:focus, form button:focus {
   outline: none;
 }
+
+@media (max-width: 1000px){
+	.container, .header {
+		width: 90%;	
+	}
+}
 </style>
 </head>
 <body>
@@ -84,15 +84,17 @@ form input:focus, form textarea:focus, form button:focus {
 	<div class="container">
 		<div class="col">
 		  <form action="javascript:void(0)">
-				<textarea name="message" placeholder="Enter some text you would like to encrypt/decrypt." cols="30" rows="10" id="textInput"></textarea>
-				 <input id="keyInput" placeholder="Enter a secret key.">
-				<button onclick="cipher(1)">Encrypt</button>
-				<button onclick="cipher(2)">Decrypt</button>
+				<textarea class="col" name="message" placeholder="Enter some text you would like to encrypt/decrypt." cols="30" rows="10" id="textInput"></textarea>
+				<div class="col">
+					<input id="keyInput" placeholder="Enter a secret key." autocomplete="off">
+					<button onclick="cipher(1)">Encrypt</button>
+					<button onclick="cipher(2)">Decrypt</button>
+				</div>
 			</form>
 		</div>
 	</div>
 	
-	<div class="col result" id="result"></div>
+	<div class="container result" id="result"></div>
 <script id="jsbin-javascript">
 var chars = "aAbBcCdDeEfFgGhHiIjJkKlLmMnNoOpPqQrRsStTuUvVwWxXyYzZ1234567890 .,/:;".split(""),
 		textInput = document.getElementById("textInput"),
@@ -100,27 +102,31 @@ var chars = "aAbBcCdDeEfFgGhHiIjJkKlLmMnNoOpPqQrRsStTuUvVwWxXyYzZ1234567890 .,/:
 		resultDiv = document.getElementById("result");
 
 function cipher(s){
-	var newMessage = "", i,
-			m = textInput.value,
-			k = keyInput.value,
-			newLetter, letter, keyLetter, letterIndex;
+	var newMessage = "", i, m, k, letter, newLetter, keyLetter, letterIndex;
 	
-	for (i = 0; i < m.length; i++){
-		letter = m[i];
-		keyLetter = k[i % k.length];
-		if (chars.indexOf(letter) !== -1){
-			if (s == 1){
-				newLetter = chars[(chars.indexOf(letter) + chars.indexOf(keyLetter)) % chars.length];
-				newMessage += newLetter;
+	try {
+		m = textInput.value;
+		k = keyInput.value;
+		if (!m || !k) throw "Error - You must have a valid key and message.";
+		for (i = 0; i < m.length; i++){
+			letter = m[i];
+			keyLetter = k[i % k.length];
+			if (chars.indexOf(letter) !== -1){
+				if (s == 1){
+					newLetter = chars[(chars.indexOf(letter) + chars.indexOf(keyLetter)) % chars.length];
+					newMessage += newLetter;
+				}
+				if (s == 2){
+					letterIndex = chars.indexOf(letter) - chars.indexOf(keyLetter);
+					newLetter = chars[((letterIndex % chars.length)+chars.length) % chars.length];
+					newMessage += newLetter;
+				}
+			} else {
+				newMessage += letter;
 			}
-			if (s == 2){
-				letterIndex = chars.indexOf(letter) - chars.indexOf(keyLetter);
-				newLetter = chars[((letterIndex % chars.length)+chars.length) % chars.length];
-				newMessage += newLetter;
-			}
-		} else {
-			newMessage += letter;
 		}
+	} catch(err){
+		newMessage = err;	
 	}
 	
 	resultDiv.innerHTML = newMessage;
