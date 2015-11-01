@@ -15,42 +15,60 @@
 <body id="body">
   <canvas id="c"></canvas>
 	<script>
+
 	// Initialising variables
-	var ctx = c.getContext("2d"),
+	var n,
+		score,
+		color,
+		player,
+		active,
+		running,
+		barriers,
+		tries = 0,
+		frames = 0,
+		flashFrames,
+		borderColor,
+		gravity = 3,
+		highScore = 0,
 		W = innerWidth,
 		H = innerHeight,
+		playerSpeed = 5,
+		backgroundColor,
+		flashLength = 12,
 		gameHeight = 543,
+		flashing = false,
+		trailOpacity = 0.5,
+		barrierHeight = 200,
+		verticalBarrierSpeed = 4,
+		ctx = c.getContext("2d"),
+		horizontalBarrierSpeed = 8,
+		gravityAcceleration = 1.02,
+		death = new Audio("death.mp3"),
+		playerSpeedDeceleration = 0.975,
 		borderHeight = (H - gameHeight)/2,
-		barrierHeight = 160;
+		scoreSound = new Audio("sound53.wav"),
+		colors = ["#BFFF00", "#42FFCB", "#FF637D"],
+		backgroundMusic = new Audio("background.mp3"),
+		backgroundColors = ["191, 255, 0", "66, 255, 203", "255, 99, 125"];
 
 	// Setting canvas dimensions
 	c.width = W;
-	c.height = H;
+	c.height = H; 
 
-	// Some more variables
-	var player,
-		active,
-		barriers,
-		n,
-		score,
-		highScore = 0,
-		playerSpeed = 3,
-		barrierSpeed = 4,
-		frames = 0,
-		tries = 0,
-		running,
-		color = "#EC7357",
-		ding = new Audio("ding.mp3"),
-		ding2 = new Audio("ding2.mp3"),
-		death = new Audio("death.mp3"),
-		sound = true;
+	backgroundMusic.play();
 
 	// Restores all variables
 	function init(){
+		backgroundColor = "255, 255, 255";
+		color = colors[Math.floor(Math.random() * colors.length)];
+		borderColor = color;
 		ctx.fillStyle = color;
+		ctx.fillRect(0,0,c.width,(H-gameHeight)/2);
+		ctx.fillRect(0,c.height-(H-gameHeight)/2,c.width,(H-gameHeight)/2);
 		ctx.font = "50px Arial";
 		player = {
-			size: 20,
+			width: 20,
+			height: 20,
 			x: 200,
 			y: c.height / 2 - 10
 		};
@@ -59,6 +77,8 @@
 		n = 0;
 		score = 0;
 		running = true;
+		gravity = 3;
+		flashFrames = 0;
 	}
 
 	// Draws to the canvas
@@ -66,11 +86,28 @@
 		if (running){
 			var i, barrier;
 
-			ctx.clearRect(0,0,c.width,c.height);
-		  	ctx.fillRect(player.x, player.y, player.size, player.size);
-			ctx.fillRect(0,0,c.width,(H-gameHeight)/2);
-			ctx.fillRect(0,c.height-(H-gameHeight)/2,c.width,(H-gameHeight)/2);
+			if (flashing){
+				backgroundColor = backgroundColors[colors.indexOf(color)];
+				flashFrames++;
+			}
+			else
+				backgroundColor = "255, 255, 255";
+
+			ctx.fillStyle = "rgba(" + backgroundColor + "," + trailOpacity + ")";
+			ctx.fillRect(0,borderHeight,c.width,c.height-borderHeight*2);
+
+			if (flashing)
+				ctx.fillStyle = "#fff";
+			else
+				ctx.fillStyle = color;
+
+		  	ctx.fillRect(player.x, player.y, player.width, player.height);
 			ctx.fillText(score, c.width - 70, borderHeight + 50);
+
+			if (flashFrames === flashLength){
+				flashing = false;
+				flashFrames = 0;
+			}
 
 			for (i = 0; i < n; i++){
 				barrier = barriers[i];
@@ -85,12 +122,21 @@
 		var i, barrier;
 
 		// Move up
-		if (active)
+		if (active){
 			player.y -= playerSpeed;
+			gravity = 3;
+			player.width *= 0.98;
+		}
 
 		// Move down
-		else
-			player.y += playerSpeed;
+		else {
+			gravity *= gravityAcceleration;
+			playerSpeed *= playerSpeedDeceleration;
+			player.y -= playerSpeed;
+			player.y += gravity;
+			if (player.width < 20)
+				player.width *= 1.02;
+		}
 		
 		// Detects collision with borders
 		if (player.y + 20> c.height - borderHeight || player.y < borderHeight){
@@ -101,6 +147,8 @@
 			if (tries === 3){
 				tries = 0;
 				running = false;
+				if (flashing)
+					ctx.fillStyle = colors[backgroundColors.indexOf(backgroundColor)];
 				gameOver();
 				return;
 			} else {
@@ -112,7 +160,7 @@
 			barrier = barriers[i];
 
 			// Moves barriers left
-			barrier.x-=7;
+			barrier.x -= horizontalBarrierSpeed;
 
 			// Destroys barriers
 			if (barrier.x < -20){
@@ -137,19 +185,25 @@
 			}
 			
 			// Detects if player passes barrier
-			if (player.x > barrier.x + 20 && player.x < barrier.x + 27){
+			if (player.x > barrier.x + 20 && player.x < barrier.x + 33){
 				score++;
-				if (sound) { ding.play(); sound = false; }
-				else { ding2.play(); sound = true; }
+				scoreSound.play();
+				flashing = true;
 			}
 
 			// Sets barrier direction to up
-			if (barrier.y + barrierHeight >= H - borderHeight)
+			if (barrier.y + barrierHeight >= H - borderHeight) {
 				barrier.vy = -Math.abs(barrier.vy);
+				ctx.fillStyle = borderColor;
+				ctx.fillRect(0,c.height-(H-gameHeight)/2,c.width,(H-gameHeight)/2);
+			}
 
 			// Sets barrier direction to down
-			if (barrier.y <= borderHeight)
+			if (barrier.y <= borderHeight) {
 				barrier.vy = Math.abs(barrier.vy);
+				ctx.fillStyle = borderColor;
+				ctx.fillRect(0,0,c.width,(H-gameHeight)/2);
+			}
 			
 			// Moves barrier
 			barrier.y += barrier.vy;
@@ -162,7 +216,7 @@
 		barriers.push({
 			x: c.width,
 			y: borderHeight + Math.floor(Math.random() * (gameHeight - barrierHeight)),
-			vy: Math.random() > 0.5 ? barrierSpeed : -Math.abs(barrierSpeed)
+			vy: Math.random() > 0.5 ? verticalBarrierSpeed : -Math.abs(verticalBarrierSpeed)
 		});
 	}
 
@@ -171,10 +225,18 @@
 		ctx.fillRect(0,0,c.width,c.height);
 		ctx.fillStyle = "white";
 		ctx.fillText("Game Over", 150, H / 2 - 15);
-		ctx.font = "16px Arial";
+		ctx.font = "30px Arial";
 		ctx.fillText("Your High Score was: " + highScore, 160, H / 2 + 30);
 		highScore = 0;
 		setTimeout(function(){ ctx.clearRect(0,0,c.width,c.height); init(); main(); return; }, 3000);
+	}
+
+	function eventHandler(){
+		playerSpeed = 5;
+		active = true;
+		setTimeout(function(){
+			active = false;
+		}, 200);
 	}
 
 	// The main program
@@ -182,23 +244,20 @@
 		if (running){
 			frames++;
 			if (frames === 60) { frames = 0; createBarriers(); }
+
 			update();
 			draw();
 			requestAnimationFrame(main);
+
 		} else {
 			return;
 		}
 	}
 
 	// Event Listeners
-	addEventListener("keydown", function(){ active = true; });
-	addEventListener("keyup", function(){ active = false; });
-
-	addEventListener("mousedown", function(){ active = true; });
-	addEventListener("mouseup", function(){ active = false; });
-
-	addEventListener("touchstart", function(){ active = true; });
-	addEventListener("touchend", function(){ active = false; });
+	addEventListener("mousedown", eventHandler);
+	addEventListener("keydown", eventHandler);
+	addEventListener("touchstart", eventHandler);
 
 	// Houston, we have lift-off.
 	init(); 
