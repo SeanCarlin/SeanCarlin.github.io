@@ -1,0 +1,51 @@
+body {
+	margin: 0;
+}
+
+a {
+	color: inherit;
+	text-decoration: none;
+	font-family: Open Sans;
+}
+
+.title {
+	font-family: lobster;
+	color: #2E294E;
+	text-align: center;
+	margin: 60px auto 0;
+	font-size: 50px;
+}
+
+.links {
+	width: 200px;
+	margin: 80px auto 50px;
+}
+
+.link {
+	display: block;
+	text-align: center;
+	padding: 20px;
+	margin: 20px 0;
+	border: 3px solid #aaa;
+	position: relative;
+	color: #2E294E;
+}
+
+.link::after {
+	content: "";
+	display: block;
+	width: 100%;
+	height: 100%;
+	opacity: 0;
+	border: 3px solid #2E294E;
+	position: absolute;
+	top: -10px;
+	left: 10px;
+	transition: 0.3s ease;
+}
+
+.link:hover::after {
+	top: -3px;
+	left: -3px;
+	opacity: 1;
+}
