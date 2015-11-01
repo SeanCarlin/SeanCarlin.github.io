@@ -54,7 +54,7 @@ form input, form textarea {
 	border: 3px solid #2E294E;
 }
 
-form button {
+button {
 	font-family: courier;
 	color: #D7263D;
 	background: #fff;
@@ -64,19 +64,59 @@ form button {
 	margin-bottom: 20px;
 }
 
-form button:hover {
+button:hover {
 	cursor: pointer;
 	color: white;
 	background: #D7263D;
 }
 
-form input:focus, form textarea:focus, form button:focus {
+form input:focus, form textarea:focus, form button:focus, .info-btn:focus {
   outline: none;
+}
+
+.info-btn {
+	position: absolute;
+	right: 20px;
+	bottom: 0px;
+	border-color: #2E294E;
+	color: #2E294E;
+}
+
+.info-btn:hover {
+	color: white;
+	background-color: #2E294E;
+}
+
+.info {
+	position: absolute;
+	border: 3px solid #2E294E;
+	top: 80px;
+	left: 25%;
+	box-sizing: border-box;
+	background-color: white;
+	font-family: courier;
+	font-size: 13.33px;
+	padding: 20px;
+	display: none;
+}
+
+.info #title {
+	background-color: white;
+	color: #2E294E;
+	text-align: center;
+}
+
+.note {
+	margin-bottom: 50px;
 }
 
 @media (max-width: 1160px){
 	.container, .header {
 		width: 90%;	
+	}
+
+	.info {
+		left: 5%;
 	}
 }
 </style>
@@ -89,32 +129,42 @@ form input:focus, form textarea:focus, form button:focus {
 				<textarea class="col" name="message" placeholder="Enter some text you would like to encrypt/decrypt." cols="30" rows="10" id="textInput"></textarea>
 				<div class="col">
 					<input id="keyInput" placeholder="Enter a secret key." autocomplete="off">
-					<button onclick="cipher(1)">Encrypt</button>
-					<button onclick="cipher(2)">Decrypt</button>
+					<button onclick="encrypt()">Encrypt</button>
+					<button onclick="decrypt()">Decrypt</button>
 					<button onclick="genKey()">Random Key</button>
 				</div>
 			</form>
 		</div>
 	</div>
 	
-	<div class="container result" id="result"></div>
-<script id="jsbin-javascript">
-var chars = "aAbBcCdDeEfFgGhHiIjJkKlLmMnNoOpPqQrRsStTuUvVwWxXyYzZ1234567890 .,/:;".split(""),
-		textInput = document.getElementById("textInput"),
-		keyInput = document.getElementById("keyInput"),
-		resultDiv = document.getElementById("result");
+	<div class="container result" id="result" style="white-space: pre; overflow: scroll;"></div>
 
-function cipher(s){
-	var newMessage = "", i, m, k, letter, newLetter, keyLetter, letterIndex;
+	<button onclick="showInfo()" class="info-btn">Info</button>
+
+	<div class="container info" id="info">
+		<h3 id="title">Info</h3>
+		<p>The method of encryption used in this website is known as a Vigenere Cipher or a Polyalphabetic Cipher. While it is difficult to decipher text encrypted using this method, it is by no means impossible. Depending on the strength of your key, frequency analysis can and other methods can be used to decipher encrypted text. You may use multiple keys to encrypt your message by seperating them with a colon.</p>
+		<p class="note">NOTE: The website supports only alphanumeric characters as well as spaces, periods and commas. Any other characters will not be encrypted.</p>
+		<button onclick="hideInfo()" class="info-btn close-btn">Close</button>
+	</div>
 	
-	try {
-		m = textInput.value;
-		k = keyInput.value;
-		if (!m && !k) throw "";
-		if (!m || !k) throw "Error - You must have a valid key and message.";
+	<script>
+	var chars = "aAbBcCdDeEfFgGhHiIjJkKlLmMnNoOpPqQrRsStTuUvVwWxXyYzZ1234567890., ".split(""),
+			textInput = document.getElementById("textInput"),
+			keyInput = document.getElementById("keyInput"),
+			resultDiv = document.getElementById("result"),
+			k;
+
+	function cipher(m, k, s){
+		var newMessage = "", i, letter, newLetter, keyLetter, letterIndex;
+		
 		for (i = 0; i < m.length; i++){
 			letter = m[i];
 			keyLetter = k[i % k.length];
+
+			if (chars.indexOf(keyLetter) === -1)
+				return "Invalid character in key.";
+
 			if (chars.indexOf(letter) !== -1){
 				if (s == 1){
 					newLetter = chars[(chars.indexOf(letter) + chars.indexOf(keyLetter)) % chars.length];
@@ -129,23 +179,68 @@ function cipher(s){
 				newMessage += letter;
 			}
 		}
-	} catch(err){
-		newMessage = err;	
-	}
-	
-	resultDiv.innerHTML = newMessage;
-}
+		
+		return newMessage;
 
-function genKey(){
-	var newKey = "", i;
-
-	for (i = 0; i < Math.floor(Math.random()*10)+5; i++){
-		newKey += chars[Math.floor(Math.random()*chars.length)]	
 	}
 
-	keyInput.value = newKey;
-}
+	function encrypt(){
+		try {
+			var keys = keyInput.value ? keyInput.value.split(":") : "",
+				result = textInput.value,
+				i;
 
-</script>
+			if (!keys[0] && !result) throw "";
+			if (!keys || !result) throw "Error - you must enter a valid message and key.";
+
+			for (i = 0; i < keys.length; i++){
+				result = cipher(result, keys[i], 1);
+			}
+
+			resultDiv.innerHTML = result;
+		} catch(err) {
+			resultDiv.innerHTML = err;
+		}
+		
+	}
+
+	function decrypt(){
+		try {
+			var keys = keyInput.value ? keyInput.value.split(":") : "",
+				result = textInput.value,
+				i;
+
+			if (!keys[0] && !result) throw "";
+			if (!keys || !result) throw "Error - you must enter a valid message and key.";
+
+			for (i = keys.length - 1; i > -1; i--){
+				result = cipher(result, keys[i], 2);
+			}
+
+			resultDiv.innerHTML = result;
+		} catch(err) {
+			resultDiv.innerHTML = err;
+		}
+	}
+
+	function genKey(){
+		var newKey = "", i;
+
+		for (i = 0; i < Math.floor(Math.random()*10)+5; i++){
+			newKey += chars[Math.floor(Math.random()*chars.length)]	
+		}
+
+		keyInput.value = newKey;
+	}
+
+	function showInfo(){
+		document.getElementById("info").style.display = "block";
+	}
+
+	function hideInfo(){
+		document.getElementById("info").style.display = "none";
+	}
+
+	</script>
 </body>
 </html>
