@@ -10,6 +10,11 @@ body {
 	margin: 0;
 }
 
+input, textarea {
+	-webkit-appearance: none;
+	border-radius: 0;
+}
+
 #title {
   font-family: "Lobster";
 	padding: 20px 0;
@@ -147,7 +152,7 @@ form input:focus, form textarea:focus, form button:focus, .info-btn:focus {
 		<p class="note">NOTE: The website supports only alphanumeric characters as well as spaces, periods and commas. Any other characters will not be encrypted.</p>
 		<button onclick="hideInfo()" class="info-btn close-btn">Close</button>
 	</div>
-	
+
 	<script>
 	var chars = "aAbBcCdDeEfFgGhHiIjJkKlLmMnNoOpPqQrRsStTuUvVwWxXyYzZ1234567890., ".split(""),
 			textInput = document.getElementById("textInput"),
