@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>Graphing Calculator</title>
+<style>
+body { margin: 0; }
+#c { display: block; background: #000030; }
+form {
+  margin: 0;
+	position: absolute;
+	top: calc(100vh - 60px);
+	right: 20px;
+}
+
+form input {
+	background: #000050;
+	border: 2px solid #0000AA;
+	padding: 10px 50px;
+	color: white;
+	font-family: Open Sans;
+}
+
+#s {
+	display: none;
+}
+</style>
+</head>
+<body>
+  <canvas id="c"></canvas>
+	<form action="javascript:chgEqn()">
+	  <input type="text" id="equation" autocomplete="off">
+		<input type="submit" value="Submit" id="s">
+	</form>
+<script>
+c.width = innerWidth;
+c.height = innerHeight;
+
+cx = c.getContext("2d");
+cx.fillStyle = "#fff";
+cx.strokeStyle = "#fff";
+
+var coords = [],
+		i,
+		n = c.width,
+		sin = Math.sin,
+		cos = Math.cos,
+		tan = Math.tan,
+		p = Math.pow,
+		t = 0,
+		eqn = "sin(x*0.04)*x";
+
+equation.value = eqn;
+
+for (i = -n/2; i < n/2; i++){
+	coords.push([i, getCoords(i)]);
+}
+
+function getCoords(x){
+	try {
+	  return eval(eqn);//sin(x*0.01+t)*x;
+	}
+	
+	catch(err){
+		return 0;
+	}
+}
+
+function update(){
+	for (var i = 0; i < n; i++){
+		coords[i][1] = getCoords(coords[i][0]);
+	}
+}
+
+function draw(){
+	cx.beginPath();
+	for (i = 0; i < coords.length; i++){
+		var graphX = coords[i][0];
+		var graphY = coords[i][1];
+		
+		var realX = graphX < 0 ? c.width/2 + graphX : graphX + c.width/2;
+		var realY = graphY < 0 ? c.height/2 + -graphY : c.height/2 - graphY;
+
+		//cx.lineTo(realX, realY);
+		//cx.moveTo(realX, realY);
+		cx.fillRect(realX, realY, 2, 2);
+	}
+	cx.closePath();
+	cx.stroke();
+}
+
+function grid(){
+	cx.strokeStyle = "#0000AF";
+	cx.lineWidth = 2;
+	cx.beginPath();
+	cx.moveTo(0,c.height/2);
+	cx.lineTo(c.width,c.height/2);
+	cx.moveTo(c.width/2,0);
+	cx.lineTo(c.width/2,c.height);
+	cx.closePath();
+	cx.stroke();
+}
+
+function main(){
+	cx.clearRect(0,0,c.width,c.height);
+	grid();
+	update();
+	draw();
+	t+=0.1;
+	requestAnimationFrame(main);
+}
+
+function chgEqn(){
+	eqn = equation.value;
+	t = 0;
+}
+
+
+
+// Liftoff
+main();
+</script>
+</body>
+</html>
