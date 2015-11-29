@@ -1,0 +1,31 @@
+* {
+  font-family: courier;
+}
+
+a{
+  text-decoration: none;
+  color: inherit;
+}
+
+body{
+  margin:0;
+}
+
+#title {
+  text-align: center;
+}
+
+.info {
+  text-align: center;
+}
+
+canvas {
+  display:block;
+  border: 3px solid;
+  margin-left: calc((100vw - 506px) / 2);
+}
+
+.buttons {
+  text-align: center;
+  margin-top: 5px;
+}

@@ -4,27 +4,30 @@
 <head>
   <meta charset="utf-8">
   <title>Game of Life</title>
-  <style>
-    body{margin:0;}
-    canvas{
-      display:block;
-      border: 3px solid;
-      position: absolute;
-      left: 50%;
-      top: 50%;
-      transform: translateX(-50%) translateY(-50%);
-    }
-  </style>
+  <link rel="stylesheet" href="main.css">
 </head>
-<body>
+<body id="body">
+  <h3 id="title">Game of Life</h3>
+  <div class="info">
+    Generation: <span id="gen"></span>
+    Population: <span id="num"></span>
+  </div>
   <canvas id="c"></canvas>
+  <div class="buttons">
+    <button type="button" name="button" onclick="start();">Start</button>
+    <button type="button" name="button" onclick="stop();">Stop</button>
+    <button type="button" name="button" onclick="resetCanvas();">Clear</button>
+    <button type="button" name="button" onclick="randomGrid();">Random</button>
+    <button type="button" name="button" onclick="mainloop();">Step</button>
+    <button type="button" name="button"><a href="https://en.wikipedia.org/wiki/Conway%27s_Game_of_Life">About</a></button>
+  </div>
 
-  <button type="button" name="button" onclick="start();">Start</button>
-  <button type="button" name="button" onclick="stop();">Stop</button>
-  <button type="button" name="button" onclick="clearCanvas();">Clear</button>
-  <button type="button" name="button" onclick="randomGrid();">Random</button>
-
-  <span id="gen"></span>
+  <div class="buttons">
+    <button type="button" name="button" onclick="initPattern(patterns.gliderGun);">Glider Gun</button>
+    <button type="button" name="button" onclick="initPattern(patterns.glider);">Glider</button>
+    <button type="button" name="button" onclick="initPattern(patterns.pentadecathlon);">Pentadecathlon</button>
+    <button type="button" name="button" onclick="initPattern(patterns.pulsar);">Pulsar</button>
+  </div>
 
   <script src="main.js"></script>
 </body>
