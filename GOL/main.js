@@ -1,5 +1,5 @@
 
-function size(){
+/*function size(){
   if (innerWidth < 496){
     c.width = innerWidth-6;
     c.style.marginLeft = "0";
@@ -8,9 +8,12 @@ function size(){
     c.width = 496;
     c.style.marginLeft = "calc((100vw - "+c.width+"px) / 2)";
   }
-}
+}*/
 
+c.width = 496;
 c.height = 496;
+
+c.style.marginLeft = "calc((100vw - "+c.width+"px) / 2)";
 
 var cx = c.getContext("2d");
 
@@ -175,8 +178,6 @@ addEventListener("mouseup", function(e){
   flag = false;
 });
 
-addEventListener("resize", size);
-
 
 function eventHandler(e){
   var x = Math.floor((e.pageX - c.offsetLeft - 3) / cellSize),
@@ -200,5 +201,4 @@ function eventHandler(e){
 
 
 // Lift-off
-size();
 init();
