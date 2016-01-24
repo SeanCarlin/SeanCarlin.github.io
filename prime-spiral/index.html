@@ -17,11 +17,10 @@ canvas {
 <body>
 <canvas id="c"></canvas>
 <script>
+c.width = 1000;
+c.height = 1000;
 
-c.width = 500;
-c.height = 500;
-
-var size = 2,
+var size = 1,
 	cx = c.getContext("2d"),
 	order = ["r", "u", "l", "d"];
 
@@ -40,73 +39,62 @@ function prime(p){
 	return true;
 }
 
+// Calculates color based on distance from centre
 function color(x,y){
 	var diffX = Math.abs(c.width/2 - x),
 		diffY = Math.abs(c.height/2 - y),
-		h = Math.sqrt((diffX*diffX + diffY*diffY)),
+		hyp = Math.sqrt((diffX*diffX + diffY*diffY)),
 		totalDiff, transparency;
 	
 	totalDiff = Math.sqrt(Math.pow(c.width/2, 2) + Math.pow(c.height/2, 2));
-	transparency = (totalDiff - h)/totalDiff;
+	transparency = (totalDiff - hyp)/totalDiff;
 	return "rgba(0,255,255,"+transparency+")";
 }
 
-var x = c.width/2,
-	y = c.height/2,
-	n = 0,
-	m = 1,
-	count = 0,
-	tCount = 1,
-	dir = order[n];
+var x = c.width/2, // Starting x coordinate
+	y = c.height/2, // Starting y coordinate
+	n = 0, // Change in direction
+	m = 1, // Increase line length
+	p = 0, // Current square in line
+	q = 1, // Total line length
+	i = 1, // Current number
+	dir = order[n]; // Starting direction of line
 
-var i = 1;
 function mainloop(){
-	
 	cx.fillStyle = color(x,y);
-	
-	if (count === tCount){
+	if (p === q){
 		m++;
 		if (m === 3){
-		  tCount++;
+			q++;
 			m = 1;
 		}
 		
-		count = 0;
+		p = 0;
 		n++;
 		dir = order[n % order.length];
 	}
-	
-	if(prime(i)){
+	if(prime(i))
 		cx.fillRect(x,y,size,size);
-	}
 	
-	if (dir == "r"){
+	if (dir == "r")
 		x+=size;
-	}
 		
-	if (dir == "u"){
+	if (dir == "u")
 		y-=size;
-	}
 
-	if (dir == "l"){
+	if (dir == "l")
 		x-=size;
-	}
 
-	if (dir == "d"){
+	if (dir == "d")
 		y+=size;
-	}
-
 	
 	i++;
-	count++;
-	
+	p++;
 	if (i >= c.width*c.height/Math.pow(size,2)){
 		clearInterval(loop);
 	}
 }
-
 var loop = setInterval(mainloop,1);
-
 </script>
 </body>
 </html>
