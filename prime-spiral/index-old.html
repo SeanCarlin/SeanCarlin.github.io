@@ -38,6 +38,7 @@ function prime(p){
 	}
 	return true;
 }
+
 // Calculates color based on distance from centre
 function color(x,y){
 	var diffX = Math.abs(c.width/2 - x),
@@ -49,6 +50,7 @@ function color(x,y){
 	transparency = (totalDiff - hyp)/totalDiff;
 	return "rgba(0,255,255,"+transparency+")";
 }
+
 var x = c.width/2, // Starting x coordinate
 	y = c.height/2, // Starting y coordinate
 	n = 0, // Change in direction
@@ -56,8 +58,8 @@ var x = c.width/2, // Starting x coordinate
 	p = 0, // Current square in line
 	q = 1, // Total line length
 	i = 1, // Current number
-	dir = order[n], // Starting direction of line
-	r = 0;
+	dir = order[n]; // Starting direction of line
+
 function mainloop(){
 	cx.fillStyle = color(x,y);
 	if (p === q){
@@ -66,6 +68,7 @@ function mainloop(){
 			q++;
 			m = 1;
 		}
+		
 		p = 0;
 		n++;
 		dir = order[n % order.length];
@@ -87,18 +90,11 @@ function mainloop(){
 	
 	i++;
 	p++;
-	r++;
-	if (i < c.width*c.height/Math.pow(size,2)){
-		if (r < 10000){
-			mainloop();
-		} else {
-			r = 0;
-		}
-	} else {
+	if (i >= c.width*c.height/Math.pow(size,2)){
 		clearInterval(loop);
 	}
 }
-var loop = setInterval(mainloop,16);
+var loop = setInterval(mainloop,1);
 </script>
 </body>
 </html>
