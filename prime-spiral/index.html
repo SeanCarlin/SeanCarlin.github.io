@@ -8,9 +8,9 @@ body {margin: 0; background: #000;}
 canvas {
 	display: block;
 	position: absolute;
-	top: 50%;
 	left: 50%;
-	transform: translateX(-50%) translateY(-50%);
+	-webkit-transform: translateX(-50%);
+	transform: translateX(-50%);
 }
 </style>
 </head>
@@ -19,10 +19,6 @@ canvas {
 <script>
 c.width = 1000;
 c.height = 1000;
-
-var size = 1,
-	cx = c.getContext("2d"),
-	order = ["r", "u", "l", "d"];
 
 function prime(p){
 	var i;
@@ -42,23 +38,29 @@ function prime(p){
 function color(x,y){
 	var diffX = Math.abs(c.width/2 - x),
 		diffY = Math.abs(c.height/2 - y),
-		hyp = Math.sqrt((diffX*diffX + diffY*diffY)),
+		hyp = Math.sqrt(Math.pow(diffX,2) + Math.pow(diffY,2)),
 		totalDiff, transparency;
 	
 	totalDiff = Math.sqrt(Math.pow(c.width/2, 2) + Math.pow(c.height/2, 2));
 	transparency = (totalDiff - hyp)/totalDiff;
 	return "rgba(0,255,255,"+transparency+")";
+	//return "hsl("+transparency*360+",100%,50%)";
 }
+
 var x = c.width/2, // Starting x coordinate
 	y = c.height/2, // Starting y coordinate
-	n = 0, // Change in direction
 	m = 1, // Increase line length
 	p = 0, // Current square in line
 	q = 1, // Total line length
 	i = 1, // Current number
-	dir = order[n], // Starting direction of line
-	r = 0;
-function mainloop(){
+	dir = 0, // Starting direction of line
+	r = 0, // Number or recursions
+	size = 1,
+	cx = c.getContext("2d"),
+	chunkSize = 1000;
+
+	
+function main(){
 	cx.fillStyle = color(x,y);
 	if (p === q){
 		m++;
@@ -67,38 +69,44 @@ function mainloop(){
 			m = 1;
 		}
 		p = 0;
-		n++;
-		dir = order[n % order.length];
+		
+		dir++;
+		dir %= 4;
 	}
 	if(prime(i))
 		cx.fillRect(x,y,size,size);
 	
-	if (dir == "r")
+	if (dir == 0)
 		x+=size;
 		
-	if (dir == "u")
+	if (dir == 1)
 		y-=size;
 
-	if (dir == "l")
+	if (dir == 2)
 		x-=size;
 
-	if (dir == "d")
+	if (dir == 3)
 		y+=size;
 	
 	i++;
 	p++;
 	r++;
+	
 	if (i < c.width*c.height/Math.pow(size,2)){
-		if (r < 10000){
-			mainloop();
+		if (r < chunkSize){
+			main();
 		} else {
 			r = 0;
 		}
 	} else {
 		clearInterval(loop);
+		end = (new Date()).getTime();
+		console.log("Executed in: " + (end - start) / 1000 + "s");
 	}
 }
-var loop = setInterval(mainloop,16);
+var start = (new Date()).getTime(),
+	end;
+var loop = setInterval(main,1);
 </script>
 </body>
 </html>
