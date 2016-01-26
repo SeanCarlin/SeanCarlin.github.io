@@ -26,7 +26,7 @@ function prime(p){
 	if (p % 2 === 0 && p !== 2 || p === 1){
 		return false;
 	} else {
-		for (i = 3; i < p/2; i+=2){
+		for (i = 3; i <= Math.sqrt(p); i+=2){
 			if (p % i === 0){
 				return false;
 			}
@@ -34,6 +34,7 @@ function prime(p){
 	}
 	return true;
 }
+
 // Calculates color based on distance from centre
 function color(x,y){
 	var diffX = Math.abs(c.width/2 - x),
@@ -75,7 +76,7 @@ function main(){
 	}
 	if(prime(i))
 		cx.fillRect(x,y,size,size);
-	
+		
 	if (dir == 0)
 		x+=size;
 		
