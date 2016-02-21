@@ -4,8 +4,9 @@
   <meta charset="utf-8">
   <title>Prime Spiral</title>
 <style>
-body {margin: 0; background: #000;}
+body {margin: 0;}
 canvas {
+	background: #000;
 	display: block;
 	position: absolute;
 	left: 50%;
@@ -17,9 +18,22 @@ canvas {
 <body>
 <canvas id="c"></canvas>
 <script>
-c.width = 1000;
-c.height = 1000;
+// Initialising width and height
+// Both must be even numbers
+if (innerHeight % 2 !== 0)
+	c.height = innerHeight - 1;
+else
+	c.height = innerHeight;
 
+if (innerWidth % 2 !== 0)	
+	c.width = innerWidth - 1;
+else
+	c.width = innerWidth;
+	
+var landscape = c.width > c.height ? true : false,
+	n = landscape ? c.width*c.width : c.height*c.height;
+
+// Determines whether a given number is prime
 function prime(p){
 	var i;
 
@@ -48,6 +62,25 @@ function color(x,y){
 	//return "hsl("+transparency*360+",100%,50%)";
 }
 
+function color2(n){
+	if (n < 10)
+		return "darkblue";
+	else if (n > 10 && n < 100)
+		return "white";
+	else if (n > 100 && n < 1000)
+		return "crimson";
+	else if (n > 1000 && n < 100000)
+		return "limegreen";
+	else if (n > 100000 && n < 1000000)
+		return "magenta";
+	else if (n > 1000000 && n < 2000000)
+		return "lightskyblue";
+	else if (n > 2000000 && n < 3000000)
+		return "navy";
+	else
+		return "yellow";
+}
+
 var x = c.width/2, // Starting x coordinate
 	y = c.height/2, // Starting y coordinate
 	m = 1, // Increase line length
@@ -58,11 +91,30 @@ var x = c.width/2, // Starting x coordinate
 	r = 0, // Number or recursions
 	size = 1,
 	cx = c.getContext("2d"),
-	chunkSize = 1000;
+	chunkSize = 1000,
+	isPrime;
 
-	
+cx.fillRect(0,0,c.width,c.height);	
 function main(){
-	cx.fillStyle = color(x,y);
+	if (landscape){
+		if (y < c.height && y > 0){
+			isPrime = prime(i);
+			cx.fillStyle = color(x,y);
+			//cx.fillStyle = color2(i);
+		} else {
+			isPrime = false;
+		}
+	} else {
+		if (x < c.width && x > 0){
+			isPrime = prime(i);
+			cx.fillStyle = color(x,y);
+			//cx.fillStyle = color2(i);
+		} else {
+			isPrime = false;
+		}
+	}
+	
+	
 	if (p === q){
 		m++;
 		if (m === 3){
@@ -74,7 +126,8 @@ function main(){
 		dir++;
 		dir %= 4;
 	}
-	if(prime(i))
+	
+	if(isPrime)
 		cx.fillRect(x,y,size,size);
 		
 	if (dir == 0)
@@ -93,7 +146,7 @@ function main(){
 	p++;
 	r++;
 	
-	if (i < c.width*c.height/Math.pow(size,2)){
+	if (i < n/Math.pow(size,2)){
 		if (r < chunkSize){
 			main();
 		} else {
@@ -102,7 +155,7 @@ function main(){
 	} else {
 		clearInterval(loop);
 		end = (new Date()).getTime();
-		console.log("Executed in: " + (end - start) / 1000 + "s");
+		console.log("Executed in: " + (end - start) / 1000 + "s.");
 	}
 }
 var start = (new Date()).getTime(),
