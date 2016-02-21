@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>Prime Spiral</title>
+<style>
+body {margin: 0;}
+canvas {
+	display: block;
+	position: absolute;
+	left: 50%;
+	-webkit-transform: translateX(-50%);
+	transform: translateX(-50%);
+}
+</style>
+</head>
+<body>
+<canvas id="c"></canvas>
+<script>
+// Initialising width and height
+// Both must be even numbers
+if (innerHeight % 2 !== 0)
+	c.height = innerHeight - 1;
+else
+	c.height = innerHeight;
+
+if (innerWidth % 2 !== 0)	
+	c.width = innerWidth - 1;
+else
+	c.width = innerWidth;
+	
+var landscape = c.width > c.height ? true : false,
+	n = landscape ? c.width*c.width : c.height*c.height;
+
+// Determines whether a given number is prime
+function prime(p){
+	var i;
+
+	if (p % 2 === 0 && p !== 2 || p === 1){
+		return false;
+	} else {
+		for (i = 3; i <= Math.sqrt(p); i+=2){
+			if (p % i === 0){
+				return false;
+			}
+		}
+	}
+	return true;
+}
+
+// Calculates color based on distance from centre
+function color(x,y){
+	var diffX = Math.abs(c.width/2 - x),
+		diffY = Math.abs(c.height/2 - y),
+		hyp = Math.sqrt(Math.pow(diffX,2) + Math.pow(diffY,2)),
+		totalDiff, transparency;
+	
+	totalDiff = Math.sqrt(Math.pow(c.width/2, 2) + Math.pow(c.height/2, 2));
+	transparency = (totalDiff - hyp)/totalDiff;
+	return "rgba(0,255,255,"+transparency+")";
+	//return "hsl("+transparency*360+",100%,50%)";
+}
+
+function color2(n){
+	if (n < 10)
+		return "darkblue";
+	else if (n > 10 && n < 100)
+		return "white";
+	else if (n > 100 && n < 1000)
+		return "crimson";
+	else if (n > 1000 && n < 100000)
+		return "limegreen";
+	else if (n > 100000 && n < 1000000)
+		return "magenta";
+	else if (n > 1000000 && n < 2000000)
+		return "lightskyblue";
+	else if (n > 2000000 && n < 3000000)
+		return "navy";
+	else
+		return "yellow";
+}
+
+var x = c.width/2, // Starting x coordinate
+	y = c.height/2, // Starting y coordinate
+	m = 1, // Increase line length
+	p = 0, // Current square in line
+	q = 1, // Total line length
+	i = 1, // Current number
+	dir = 0, // Starting direction of line
+	r = 0, // Number or recursions
+	size = 1,
+	cx = c.getContext("2d"),
+	chunkSize = 1000,
+	isPrime;
+
+cx.fillRect(0,0,c.width,c.height);	
+function main(){
+	if (landscape){
+		if (y < c.height && y > 0){
+			isPrime = prime(i);
+			//cx.fillStyle = color(x,y);
+			cx.fillStyle = color2(i);
+		} else {
+			isPrime = false;
+		}
+	} else {
+		if (x < c.width && x > 0){
+			isPrime = prime(i);
+			//cx.fillStyle = color(x,y);
+			cx.fillStyle = color2(i);
+		} else {
+			isPrime = false;
+		}
+	}
+	
+	
+	if (p === q){
+		m++;
+		if (m === 3){
+			q++;
+			m = 1;
+		}
+		p = 0;
+		
+		dir++;
+		dir %= 4;
+	}
+	
+	if(isPrime)
+		cx.fillRect(x,y,size,size);
+		
+	if (dir == 0)
+		x+=size;
+		
+	if (dir == 1)
+		y-=size;
+
+	if (dir == 2)
+		x-=size;
+
+	if (dir == 3)
+		y+=size;
+	
+	i++;
+	p++;
+	r++;
+	
+	if (i < n/Math.pow(size,2)){
+		if (r < chunkSize){
+			main();
+		} else {
+			r = 0;
+		}
+	} else {
+		clearInterval(loop);
+		end = (new Date()).getTime();
+		console.log("Executed in: " + (end - start) / 1000 + "s.");
+	}
+}
+var start = (new Date()).getTime(),
+	end;
+var loop = setInterval(main,1);
+</script>
+</body>
+</html>
