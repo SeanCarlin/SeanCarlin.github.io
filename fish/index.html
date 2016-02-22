@@ -19,7 +19,7 @@ var cx = c.getContext("2d"),
 		angleIncrement = 0.09,
 		bodys = [],
 		coords = [c.width/2,c.height/2],
-		n = 100;
+		n = 500;
 		
 function toDegrees(r){
 	return r * (180/Math.PI);
@@ -37,8 +37,8 @@ function init(){
 	var i;
 	for (i = 0; i < n; i++){
 		bodys.push({
-			width: 10,
-			height: 5,
+			width: 5,
+			height: 2,
 			x: ~~(Math.random()*c.width),
 			y: ~~(Math.random()*c.height),
 			vel: 0,
@@ -63,8 +63,7 @@ function draw(){
 		
 		var thetaDegrees = toDegrees(body.theta),
 			diffX, diffY, distance, angle, angleChange, option,
-			mouseX = coords[0], mouseY = coords[1];
-			
+			mouseX = coords[0], mouseY = coords[1];		
 			
 			
 			
