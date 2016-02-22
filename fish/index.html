@@ -41,16 +41,16 @@ function init(){
 			height: 5,
 			x: ~~(Math.random()*c.width),
 			y: ~~(Math.random()*c.height),
-			force: 0,
-			maxForce: ~~(Math.random()*5)+10,
-			forceIncrement: undefined,
+			vel: 0,
+			maxvel: ~~(Math.random()*3)+3,
+			acceleration: undefined,
 			theta: toRadians(~~(Math.random()*360)),
 			accelerate: true,
 			clockwise: false,
 			anticlockwise: false
 		});
 		
-		bodys[i].forceIncrement = 0.01*bodys[i].maxForce;
+		bodys[i].acceleration = 0.01*bodys[i].maxvel;
 	}
 }
 
@@ -79,11 +79,7 @@ function draw(){
 		
 		// Controls body.accelerate and back speeds
 		if (body.accelerate)
-			body.force -= body.force > body.maxForce ? 0 : body.forceIncrement;
-		
-		// Handles acceleration and deceleration
-		if (body.force > 0 && !body.accelerate)
-			body.force *= 0.97;
+			body.vel -= Math.abs(body.vel) > body.maxvel ? 0 : body.acceleration;
 			
 		// Ensures 0 <= angle <= 360
 		if (toDegrees(body.theta) > 360)
@@ -93,8 +89,8 @@ function draw(){
 			body.theta = toRadians(360 - Math.abs(thetaDegrees % 360));
 		
 		// Gets new coordinates
-		body.x += body.force * Math.cos(body.theta);
-		body.y += body.force * Math.sin(body.theta);
+		body.x += body.vel * Math.cos(body.theta);
+		body.y += body.vel * Math.sin(body.theta);
 		
 		// FOLLOWING CODE IS FOR AI
 		// Calcultes angle at which the body needs to rotate to aim towards mouse
