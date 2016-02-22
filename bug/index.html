@@ -16,23 +16,11 @@ c.width = innerWidth;
 c.height = innerHeight;
 
 var cx = c.getContext("2d"),
-		theta = toRadians(30),
 		angleIncrement = 0.09,
-		forceIncrement = 0.1,
-		maxForce = 20,
-		clockwise = false,
-		anticlockwise = false,
-		forward = false,
-		backward = false,
-		body = {
-			width: 20,
-			height: 10,
-			x: c.width/2 - 10,
-			y: c.height/2 - 5,
-			force: 0
-		},
-		coords = [body.x, body.y];
-
+		bodys = [],
+		coords = [c.width/2,c.height/2],
+		n = 100;
+		
 function toDegrees(r){
 	return r * (180/Math.PI);
 }
@@ -44,133 +32,119 @@ function toRadians(d){
 function pythagoras(x,y){
 	return Math.sqrt(x*x + y*y);
 }
+		
+function init(){
+	var i;
+	for (i = 0; i < n; i++){
+		bodys.push({
+			width: 10,
+			height: 5,
+			x: ~~(Math.random()*c.width),
+			y: ~~(Math.random()*c.height),
+			force: 0,
+			maxForce: ~~(Math.random()*5)+10,
+			forceIncrement: undefined,
+			theta: toRadians(~~(Math.random()*360)),
+			accelerate: true,
+			clockwise: false,
+			anticlockwise: false
+		});
+		
+		bodys[i].forceIncrement = 0.01*bodys[i].maxForce;
+	}
+}
 
 function draw(){
-	var thetaDegrees = toDegrees(theta),
-		diffX, diffY, distance, angle, angleChange, option,
-		mouseX = coords[0], mouseY = coords[1];
-		
-	// Draws sprite to canvas	
+	var i, body;
 	cx.clearRect(0,0,c.width,c.height);
-	cx.save();
-	cx.translate(body.x, body.y);
-	cx.rotate(theta);
-	cx.fillRect(-body.width/2,-body.height/2,20,10);
-	cx.restore();
 	
-	// Controls rotation
-	if (clockwise)
-		theta += angleIncrement;
-	
-	else if (anticlockwise)
-		theta -= angleIncrement;
-	
-	// Controls forward and back speeds
-	if (forward)
-		body.force -= body.force > maxForce ? 0 : forceIncrement;
-	
-	else if (backward)
-		body.force += Math.abs(body.force) > maxForce ? 0 : forceIncrement;
-	
-	// Handles acceleration and deceleration
-	if (body.force > 0 && !forward || body.force < 0 && !backward)
-		body.force *= 0.97;
+	for (i = 0; i < n; i++){
+		body = bodys[i];
 		
-	// Ensures 0 <= angle <= 360
-	if (toDegrees(theta) > 360)
-		theta = toRadians(thetaDegrees % 360);
-	
-	else if (toDegrees(theta) < 0)
-		theta = toRadians(360 - Math.abs(thetaDegrees % 360));
-	
-	// Gets new coordinates
-	body.x += body.force * Math.cos(theta);
-	body.y += body.force * Math.sin(theta);
-	
-	// FOLLOWING CODE IS FOR AI
-	// Calcultes angle at which the body needs to rotate to aim towards mouse
-	diffX = Math.abs(mouseX - body.x);
-	diffY = Math.abs(mouseY - body.y);
-	distance = pythagoras(diffX, diffY);
-	angle = Math.atan(diffY/diffX);
-	
-	// Ensures angle is between 0 and 360 rather than <= 90 in quadrants
-	if (mouseX < body.x && mouseY > body.y)
-		angle = toRadians(360 - toDegrees(angle));
-	
-	else if (mouseX > body.x && mouseY > body.y)
-		angle = toRadians(180 + toDegrees(angle));
-	
-	else if (mouseX > body.x && mouseY < body.y)
-		angle = toRadians(180 - toDegrees(angle));
-	
+		var thetaDegrees = toDegrees(body.theta),
+			diffX, diffY, distance, angle, angleChange, option,
+			mouseX = coords[0], mouseY = coords[1];
+			
+			
+			
+			
+		// Draws sprite to canvas	
+		cx.save();
+		cx.translate(body.x, body.y);
+		cx.rotate(body.theta);
+		cx.fillRect(-body.width/2,-body.height/2,body.width,body.height);
+		cx.restore();
+		
+		
+		
+		// Controls body.accelerate and back speeds
+		if (body.accelerate)
+			body.force -= body.force > body.maxForce ? 0 : body.forceIncrement;
+		
+		// Handles acceleration and deceleration
+		if (body.force > 0 && !body.accelerate)
+			body.force *= 0.97;
+			
+		// Ensures 0 <= angle <= 360
+		if (toDegrees(body.theta) > 360)
+			body.theta = toRadians(thetaDegrees % 360);
+		
+		else if (toDegrees(body.theta) < 0)
+			body.theta = toRadians(360 - Math.abs(thetaDegrees % 360));
+		
+		// Gets new coordinates
+		body.x += body.force * Math.cos(body.theta);
+		body.y += body.force * Math.sin(body.theta);
+		
+		// FOLLOWING CODE IS FOR AI
+		// Calcultes angle at which the body needs to rotate to aim towards mouse
+		diffX = Math.abs(mouseX - body.x);
+		diffY = Math.abs(mouseY - body.y);
+		distance = pythagoras(diffX, diffY);
+		angle = Math.atan(diffY/diffX);
+		
+		// Ensures angle is between 0 and 360 rather than <= 90 in quadrants
+		if (mouseX < body.x && mouseY > body.y)
+			angle = toRadians(360 - toDegrees(angle));
+		
+		else if (mouseX > body.x && mouseY > body.y)
+			angle = toRadians(180 + toDegrees(angle));
+		
+		else if (mouseX > body.x && mouseY < body.y)
+			angle = toRadians(180 - toDegrees(angle));
+		
 
-	// Deciding easiest path of rotation (clockwise / anticlockwise)
-	option = toDegrees(theta) > toDegrees(angle) ? 1 : 0;
-	angleChange = option ? toDegrees(theta) - toDegrees(angle) : toDegrees(angle) - toDegrees(theta);
-	
-	if (angleChange > toDegrees(angleIncrement)){
-		if (angleChange < 360 - angleChange){
-			if (option)
-				theta -= angleIncrement;
-			else
-				theta += angleIncrement;
-		} else {
-			if (option)
-				theta += angleIncrement;
-			else
-				theta -= angleIncrement;
+		// Deciding easiest path of rotation (body.clockwise / antibody.clockwise)
+		option = toDegrees(body.theta) > toDegrees(angle) ? 1 : 0;
+		angleChange = option ? toDegrees(body.theta) - toDegrees(angle) : toDegrees(angle) - toDegrees(body.theta);
+		
+		if (angleChange > toDegrees(angleIncrement)){
+			if (angleChange < 360 - angleChange){
+				if (option)
+					body.theta -= angleIncrement;
+				else
+					body.theta += angleIncrement;
+			} else {
+				if (option)
+					body.theta += angleIncrement;
+				else
+					body.theta -= angleIncrement;
+			}
 		}
 	}
-	
-	forward = true;
-	
 	
 	// Repeats approx every 16 milliseconds
 	requestAnimationFrame(draw);
 }
 
-addEventListener("keydown", function(e){
-	if (e.keyCode === 39){
-		clockwise = true;
-	}
-	
-	if (e.keyCode === 37){
-		anticlockwise = true;
-	}
-	
-	if (e.keyCode === 38){
-		forward = true;
-	}
-	
-	if (e.keyCode === 40){
-		backward = true;
-	}
-});
-
-addEventListener("keyup", function(e){
-	if (e.keyCode === 39){
-		clockwise = false;
-	}
-	
-	if (e.keyCode === 37){
-		anticlockwise = false;
-	}
-	
-	if (e.keyCode === 38){
-		forward = false;
-	}
-	
-	if (e.keyCode === 40){
-		backward = false;
-	}
-});
-
+// Updates position of mouse
 addEventListener("mousemove", function(e){
 	coords[0] = e.pageX;
 	coords[1] = e.pageY;
 });
 
+// Start
+init();
 draw();
 </script>
 </body>
