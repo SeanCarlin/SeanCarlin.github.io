@@ -139,8 +139,8 @@ addEventListener("mousemove", function(e){
 });
 
 addEventListener("touchmove", function(e){
-	coords[0] = e.pageX;
-	coords[1] = e.pageY;
+	coords[0] = e.changedTouches[0].pageX;
+	coords[1] = e.changedTouches[0].pageY;
 });
 
 // Start
