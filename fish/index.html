@@ -138,6 +138,11 @@ addEventListener("mousemove", function(e){
 	coords[1] = e.pageY;
 });
 
+addEventListener("touchmove", function(e){
+	coords[0] = e.pageX;
+	coords[1] = e.pageY;
+});
+
 // Start
 init();
 draw();
