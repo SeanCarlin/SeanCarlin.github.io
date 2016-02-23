@@ -151,8 +151,8 @@ addEventListener("touchend", function(e){
 });
 addEventListener("touchmove", function(e){
         e.preventDefault();
-	coords[0] = e.changedTouches[0].pageX;
-	coords[1] = e.changedTouches[0].pageY;
+	coords[0] = e.originalEvent.touches[0].pageX;
+	coords[1] = e.originalEvent.touches[0].pageY;
 });
 
 // Start
