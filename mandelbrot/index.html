@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width">
+  <title>JS Bin</title>
+<style>
+body{margin: 0;}
+canvas{display: block;}
+</style>
+</head>
+<body>
+<canvas id="c"></canvas>
+<script>
+c.width = innerWidth;
+c.height = innerHeight;
+
+var cx = c.getContext("2d"),
+	n = c.width * c.height,
+	maxIteration = 100,
+	color = ["red", "green", "blue", "black"];
+
+for (var j = 0; j < c.height; j++){
+	for (var i = 0; i < c.width; i++){
+		cx.fillStyle = mandelbrot(i, j);
+		cx.fillRect(i,j,1,1);
+	}
+}
+
+function mandelbrot(x,y){
+	var graphX = c.width*0.7-x;
+	x0 = -(1 - -2.5)/c.width*graphX;//graphX/(c.width/2)*-3-1;
+	var graphY = c.height/2-y;
+	y0 = graphY/(c.height/2);
+	
+	var iteration = 0;
+	var x1 = 0.0, y1 = 0.0, xtemp;
+	while (x1*x1 + y1*y1 < 2*2 && iteration < maxIteration){
+		xtemp = x1*x1 - y1*y1 + x0;
+		y1 = 2*x1*y1 + y0;
+		x1 = xtemp;
+		iteration+=1;
+	}
+	
+	return color[iteration%color.length];
+}
+
+</script>
+</body>
+</html>

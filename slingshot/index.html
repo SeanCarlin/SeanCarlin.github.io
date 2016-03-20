@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>JS Bin</title>
+<style>
+body {margin: 0;}
+#c {display: block;}
+</style>
+</head>
+<body>
+<canvas id="c"></canvas>
+<script>
+var cx = c.getContext("2d");
+
+c.width = innerWidth;
+c.height = innerHeight;
+var gravity = 0.05;
+var ball = {
+	startX: 150,
+	startY: c.height - 150,
+	x: 150,
+	y: c.height - 150,
+	vx: 0,
+	vy: 0,
+	radius: 10,
+	speed: 0,
+	maxSpeed: 10,
+	drag: false,
+	theta: 0,
+	hasFired: false,
+	draw: function(){
+		cx.beginPath();
+		cx.arc(this.x, this.y, this.radius, 0, 2*Math.PI);
+		cx.moveTo(this.startX, this.startY);
+		cx.arc(this.startX, this.startY, 2, 0, 2*Math.PI);
+		cx.fill();
+		if (this.drag){
+			cx.moveTo(this.startX, this.startY);
+			cx.lineTo(this.x, this.y);
+		}
+		cx.closePath();
+		cx.stroke();
+	},
+	update: function(){
+		if (this.hasFired)
+		  this.vy -= gravity;
+		
+		if (this.x > c.width+this.radius || this.x < -this.radius || this.y > c.height+this.radius){
+			this.x = this.startX;
+			this.y = this.startY;
+			this.hasFired = false;
+			this.vx = 0;
+			this.vy = 0;
+			this.speed = 0;
+			this.theta = 0;
+		}
+		this.x += this.vx;
+		this.y -= this.vy;
+	},
+	fire: function(){
+		this.speed = Math.sqrt(Math.pow(this.startX - this.x,2) + Math.pow(this.startY - this.y,2)) / 100 * this.maxSpeed;
+		this.theta = Math.atan((this.y - this.startY) / (this.startX - this.x));
+		this.hasFired = true;
+		this.vx = this.speed*Math.cos(this.theta);
+		this.vy = this.speed*Math.sin(this.theta);
+		if (this.x > this.startX){
+			this.vx *= -1;
+			this.vy *= -1;
+		}
+	}
+};
+
+c.onmousedown = function(e){
+	var x = e.pageX,
+			y = e.pageY,
+			dx = Math.abs(ball.x - x),
+			dy = Math.abs(ball.y - y);
+	
+	if (Math.sqrt(dx*dx + dy*dy) < ball.radius){
+		ball.drag = true;
+	}
+};
+
+c.onmouseup = function(){
+	//c.onmousemove = null;
+	if (ball.drag){
+		ball.drag = false;
+		ball.fire();
+	} else {
+		ball.drag = false;
+	}
+};
+
+c.onmousemove = function(e){
+	var dist = (Math.sqrt(Math.pow(ball.startX - ball.x,2) + Math.pow(ball.startY - ball.y,2))),
+			mouseDist = Math.sqrt(Math.pow(ball.startX - e.pageX, 2) + Math.pow(ball.startY - e.pageY,2));
+	if (ball.drag && (dist < 100 || mouseDist < dist)){
+		ball.x = e.pageX;
+		ball.y = e.pageY;
+	}
+};
+
+function main(){
+	cx.clearRect(0,0,c.width,c.height);
+	ball.draw();
+	ball.update();
+	requestAnimationFrame(main);
+}
+
+
+main();
+
+</script>
+</body>
+</html>
