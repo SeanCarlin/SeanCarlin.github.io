@@ -26,7 +26,7 @@ var centreX = c.width/2,
 		maxSpeed = 30,
 		minSpeed = 10,
 		score = 0,
-		radius = 10,
+		radius = 13,
 		clicked = false,
 		coords = [];
 		
@@ -192,6 +192,7 @@ function clickHandler(x, y){
 }
 
 c.ontouchstart = function(e){
+	e.preventDefault();
 	clickHandler((e.touches[0] || e.changedTouches[0]).pageX, (e.touches[0] || e.changedTouches[0]).pageY);
 };
 
