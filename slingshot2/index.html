@@ -31,7 +31,6 @@ var ball = {
 	theta: 0,
 	hasFired: false,
 	draw: function(){
-		//console.log(this.x, this.y);
 		cx.beginPath();
 		cx.arc(this.x, this.y, this.radius, 0, 2*Math.PI);
 		cx.moveTo(this.startX, this.startY);
@@ -45,10 +44,10 @@ var ball = {
 		cx.stroke();
 	},
 	update: function(){
-		if (this.hasFired)
+		if (this.hasFired && this.y+this.radius < c.height)
 		  this.vy -= gravity;
 		
-		if (this.x > c.width+this.radius || this.x < -this.radius || this.y > c.height+this.radius){
+		/*if (this.x > c.width+this.radius || this.x < -this.radius || this.y > c.height+this.radius){
 			this.x = this.startX;
 			this.y = this.startY;
 			this.hasFired = false;
@@ -56,6 +55,12 @@ var ball = {
 			this.vy = 0;
 			this.speed = 0;
 			this.theta = 0;
+		}*/
+		
+		if (this.x+this.radius > c.width || this.x-this.radius < 0){
+			this.vx *= -0.8;
+		} else if (this.y-this.radius < 0 || this.y+this.radius > c.height){
+			this.vy *= -0.8;
 		}
 		this.x += this.vx;
 		this.y -= this.vy;
@@ -73,41 +78,69 @@ var ball = {
 	}
 };
 
-c.onmousedown = function(e){
-	var x = e.pageX,
-			y = e.pageY,
-			dx = Math.abs(ball.x - x),
-			dy = Math.abs(ball.y - y);
+
+function startDrag(x, y){
+	var	dx = Math.abs(ball.x - x),
+		dy = Math.abs(ball.y - y);
 	
 	if (Math.sqrt(dx*dx + dy*dy) < ball.radius && !ball.hasFired){
 		ball.drag = true;
 	}
-};
+}
 
-c.onmouseup = function(){
+function dragBall(x, y){
+	var dist = (Math.sqrt(Math.pow(ball.startX - ball.x,2) + Math.pow(ball.startY - ball.y,2))),
+		mouseDist = Math.sqrt(Math.pow(ball.startX - x, 2) + Math.pow(ball.startY - y,2));
+	if (ball.drag && (dist < 100 || mouseDist < dist)){
+		ball.x = x;
+		ball.y = y;
+	}
+}
+
+function endDrag(){
 	//c.onmousemove = null;
+	//c.ontouchmove = null;
 	if (ball.drag){
 		ball.drag = false;
 		ball.fire();
 	} else {
 		ball.drag = false;
 	}
+}
+
+//
+c.ontouchstart = function(e){
+	e.preventDefault();
+	var x = (e.touches[0] || e.changedTouches[0]).pageX,
+		y =  (e.touches[0] || e.changedTouches[0]).pageY;
+	startDrag(x, y);
+	
+};
+
+c.ontouchend = function(){
+	endDrag();
+};
+
+c.ontouchmove = function(e){
+	e.preventDefault();
+	var x = (e.touches[0] || e.changedTouches[0]).pageX,
+		y =  (e.touches[0] || e.changedTouches[0]).pageY;
+	dragBall(x, y);	
+};
+//
+
+c.onmousedown = function(e){
+	startDrag(e.pageX, e.pageY);
+};
+
+c.onmouseup = function(){
+	endDrag();
 };
 
 c.onmousemove = function(e){
-	var dist = (Math.sqrt(Math.pow(ball.startX - ball.x,2) + Math.pow(ball.startY - ball.y,2))),
-			mouseDist = Math.sqrt(Math.pow(ball.startX - e.pageX, 2) + Math.pow(ball.startY - e.pageY,2));
-	if (ball.drag && (dist < 100 || mouseDist < dist)){
-		ball.x = e.pageX;
-		ball.y = e.pageY;
-	}
-	/*var O = Math.atan2(ball.startY - e.pageY, ball.startX - e.pageX);
-	if (ball.drag){
-		ball.x = ball.startX - dist*Math.cos(O);
-		ball.y = ball.startY - dist*Math.sin(O);
-	}*/
-	
+	dragBall(e.pageX, e.pageY);
 };
+
 
 function main(){
 	cx.clearRect(0,0,c.width,c.height);

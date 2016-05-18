@@ -1,0 +1,204 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>Radar</title>
+<style>
+body {margin: 0;}
+canvas{display: block; background: #000;}
+canvas:hover {cursor:crosshair;}
+</style>
+</head>
+<body>
+<canvas id="c"></canvas>
+<script>
+c.width = innerWidth;
+c.height = innerHeight;
+
+var cx = c.getContext("2d");
+
+var centreX = c.width/2,
+		centreY = c.height/2,
+	  dist = 300,
+		planes = [],
+		n = 1, d, s, m, theta,
+		maxFrames = 127,
+		maxSpeed = 30,
+		minSpeed = 10,
+		score = 0,
+		radius = 10,
+		clicked = false,
+		coords = [];
+		
+function init(){
+	for (var i = 0; i < n; i++){
+		addPlane();
+	}
+}
+
+function reset(){
+	planes = [];
+	init();
+}
+
+cx.strokeStyle = "#00FF00";
+cx.font = "13px Courier";
+
+function addPlane(){
+	planes.push({
+		size: 100+Math.floor(Math.random()*200),
+		direction: toRadians(Math.random() * 360),
+		speed: 30,//minSpeed+Math.random()*(maxSpeed-minSpeed),
+		active: false,
+		frames: 0,
+		code: flightCode(),
+		hasMoved: false,
+		destroyed: false
+	});
+}
+
+function resetPlane(index){
+	var plane = planes[index];
+	plane.size = 100+Math.floor(Math.random()*200);
+	plane.direction = toRadians(Math.random() * 360);
+	plane.speed = 50;
+	plane.active = false;
+	plane.frames = 0;
+	plane.code = flightCode();
+	plane.hasMoved = false;
+	plane.destroyed = false;
+	return plane;
+}
+
+function toRadians(n){
+	return n*Math.PI/180;
+}
+
+function toDegrees(n){
+	return n*180/Math.PI;
+}
+
+function flightCode(){
+	var chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ",
+			code = "",
+			i;
+	
+	for (i = 0; i < 5; i++){
+		if (i < 3)
+			code += chars[Math.floor(Math.random()*chars.length)];
+		else if (i === 3)
+			code += " ";
+		else
+			code += 1000+Math.floor(Math.random()*9000);
+	}
+	
+	return code;
+}
+
+function draw(){
+	var i, plane, angleDifference;
+	
+	cx.beginPath();
+	cx.arc(centreX, centreY, 100, 0, 2*Math.PI);
+	cx.moveTo(centreX+200,centreY);
+	cx.arc(centreX, centreY, 200, 0, 2*Math.PI);
+	cx.moveTo(centreX+300,centreY);
+	cx.arc(centreX, centreY, 300, 0, 2*Math.PI);
+	cx.moveTo(centreX, centreY);
+	cx.lineTo(centreX + dist*Math.cos(theta), centreY + dist*Math.sin(theta));
+	cx.closePath();
+	cx.stroke();
+	
+	
+	if (clicked){
+		cx.beginPath();
+		cx.fillStyle = "red";
+		cx.moveTo(coords[0], coords[1]);
+		cx.arc(coords[0], coords[1], radius, 0, 2*Math.PI);
+		clicked = false;
+		cx.closePath();
+		cx.fill();
+	}
+	
+	
+	cx.fillStyle = "#00FF00";
+	cx.font = "30px Courier";
+	cx.fillText(score, c.width-200, 150);
+	cx.beginPath();
+	for (i = 0; i < planes.length; i++){
+		if (planes[i].destroyed){
+			planes[i] = resetPlane(i);
+		}
+		plane = planes[i];
+		angleDifference = toDegrees(plane.direction) - (toDegrees(theta) % 360);
+		
+		if (Math.abs(angleDifference) < 2 || plane.active){
+			plane.active = true;
+			plane.frames++;
+			if (plane.frames === maxFrames){
+				if (plane.speed > plane.size){
+					console.log("Your score was: " + score);
+					score = 0;
+					reset();
+				}
+				plane.frames = 0;
+				plane.active = false;
+				plane.hasMoved = false;
+			}
+			cx.font = "13px Courier";
+			cx.moveTo(centreX+plane.size*Math.cos(plane.direction), centreY+plane.size*Math.sin(plane.direction));
+			cx.arc(centreX+plane.size*Math.cos(plane.direction), centreY+plane.size*Math.sin(plane.direction), radius, 0, 2*Math.PI);
+			cx.fillText(plane.code, centreX+plane.size*Math.cos(plane.direction)+10, centreY+plane.size*Math.sin(plane.direction)-10);	
+			
+		}
+		
+		else if (!plane.hasMoved){
+			plane.size -= plane.speed;
+			plane.hasMoved = true;
+		}
+				
+	} 
+	cx.closePath();
+	cx.fill();
+}
+
+
+theta = toRadians(270);
+function mainloop(){
+	cx.fillStyle = "rgba(00,00,00,0.09)";
+	cx.fillRect(0,0,c.width,c.height);
+	draw();
+	theta+=0.025;
+	requestAnimationFrame(mainloop);
+}
+
+
+c.onclick = function(e){
+	var x = e.pageX,
+			y = e.pageY,
+			plane,
+			dx, dy, i;
+	
+	for (i = 0; i < planes.length; i++){
+		plane = planes[i];
+		
+		dx = e.pageX - (centreX+plane.size*Math.cos(plane.direction));
+		dy = e.pageY - (centreY+plane.size*Math.sin(plane.direction));
+		
+		if (Math.sqrt(dx*dx + dy*dy) < radius){
+			coords = [x, y];
+			clicked = true;
+			score++;
+			plane.destroyed = true;
+			addPlane();
+		}
+	}
+};
+
+// Start
+init();
+mainloop();
+
+</script>
+</body>
+</html>
