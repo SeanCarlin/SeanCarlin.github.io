@@ -26,7 +26,7 @@ var centreX = c.width/2,
 		maxSpeed = 30,
 		minSpeed = 10,
 		score = 0,
-		radius = 13,
+		radius = 10,
 		clicked = false,
 		coords = [];
 		
@@ -181,7 +181,7 @@ function clickHandler(x, y){
 		dx = x - (centreX+plane.size*Math.cos(plane.direction));
 		dy = y - (centreY+plane.size*Math.sin(plane.direction));
 		
-		if (Math.sqrt(dx*dx + dy*dy) < radius){
+		if (Math.sqrt(dx*dx + dy*dy) < radius + 4){
 			coords = [x, y];
 			clicked = true;
 			score++;
