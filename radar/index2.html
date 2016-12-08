@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>Radar</title>
+<style>
+body {margin: 0;}
+canvas{display: block; background: #000;}
+canvas:hover {cursor:crosshair;}
+</style>
+</head>
+<body>
+<canvas id="c"></canvas>
+<script>
+c.width = innerWidth;
+c.height = innerHeight;
+
+var cx = c.getContext("2d"),
+	gridSize = 100,
+	radius = 8,
+	atan = Math.atan2,
+	airfields = [
+		{
+			x: c.width/4*3,
+			y: c.height/5*4
+		}
+	],
+	planes = [];
+	
+
+cx.fillStyle = "#00FF00";
+cx.strokeStyle = "#00FF00";
+cx.font = "13px Courier";
+
+function initPlanes(){
+	var i;
+	for (i = 0; i < 5; i++){
+		planes.push({
+			x: ~~(Math.random()*c.width),
+			y: ~~(Math.random()*c.height),
+			code: flightCode()
+		});
+	}
+}
+
+function flightCode(){
+	var chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ",
+			code = "",
+			i;
+	
+	for (i = 0; i < 5; i++){
+		if (i < 3)
+			code += chars[Math.floor(Math.random()*chars.length)];
+		else if (i === 3)
+			code += " ";
+		else
+			code += 1000+Math.floor(Math.random()*9000);
+	}
+	
+	return code;
+}
+
+function drawBackground(){
+	var i;
+	cx.beginPath();
+	for (i = 1; i < c.height/gridSize; i++){
+		cx.moveTo(0,i*gridSize);
+		cx.lineTo(c.width,i*gridSize);
+	}
+	
+	for (i = 1; i < c.width/gridSize; i++){
+		cx.moveTo(i*gridSize,0);
+		cx.lineTo(i*gridSize,c.height);
+	}
+	
+	cx.closePath();
+	cx.stroke();
+}
+
+function draw(){
+	var i, plane;
+	cx.beginPath();
+	for (i = 0; i < planes.length; i++){
+		plane = planes[i];
+		cx.moveTo(plane.x,plane.y);
+		cx.arc(plane.x,plane.y,radius,0,3*Math.PI);
+		cx.fillText(plane.code,plane.x+10,plane.y-10);
+		
+		if (i < airfields.length){
+			cx.moveTo(airfields[i].x,airfields[i].y);
+			cx.arc(airfields[i].x,airfields[i].y,radius,0,2*Math.PI);
+		}
+	}
+	cx.closePath();
+	cx.fill();
+}
+
+function update(){
+
+}
+
+function mainloop(){
+	cx.clearRect(0,0,c.width,c.height);
+	drawBackground();
+	draw();
+	update();
+}
+
+
+initPlanes();
+mainloop();
+
+</script>
+</body>
+</html>

@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width">
+  <title>Swarm</title>
+<style>
+body{margin: 0;}
+canvas{display: block;}
+</style>
+</head>
+<body>
+<canvas id="c"></canvas>
+<script>
+c.width = innerWidth;
+c.height = innerHeight;
+
+var cx = c.getContext("2d"),
+		angleIncrement = 0.09,
+		bodys = [],
+		coords = [c.width/2,c.height/2],
+		n = 500;
+		
+function toDegrees(r){
+	return r * (180/Math.PI);
+}
+
+function toRadians(d){
+	return d * (Math.PI/180);
+}
+
+function pythagoras(x,y){
+	return Math.sqrt(x*x + y*y);
+}
+		
+function init(){
+	var i;
+	for (i = 0; i < n; i++){
+		bodys.push({
+			width: 5,
+			height: 2,
+			x: ~~(Math.random()*c.width),
+			y: ~~(Math.random()*c.height),
+			vel: 0,
+			maxvel: Math.random()*5+3,
+			acceleration: undefined,
+			theta: toRadians(~~(Math.random()*360)),
+			accelerate: true,
+			clockwise: false,
+			anticlockwise: false
+		});
+		
+		bodys[i].acceleration = 0.01*bodys[i].maxvel;
+	}
+}
+
+function draw(){
+	var i, body;
+	cx.clearRect(0,0,c.width,c.height);
+	
+	for (i = 0; i < n; i++){
+		body = bodys[i];
+		
+		var thetaDegrees = toDegrees(body.theta),
+			diffX, diffY, distance, angle, angleChange, option,
+			mouseX = coords[0], mouseY = coords[1];		
+			
+			
+			
+		// Draws sprite to canvas	
+		cx.save();
+		cx.translate(body.x, body.y);
+		cx.rotate(body.theta);
+		cx.fillRect(-body.width/2,-body.height/2,body.width,body.height);
+		cx.restore();
+		
+		
+		
+		// Controls body.accelerate and back speeds
+		if (body.accelerate)
+			body.vel -= Math.abs(body.vel) > body.maxvel ? 0 : body.acceleration;
+			
+		// Ensures 0 <= angle <= 360
+		if (toDegrees(body.theta) > 360)
+			body.theta = toRadians(thetaDegrees % 360);
+		
+		else if (toDegrees(body.theta) < 0)
+			body.theta = toRadians(360 - Math.abs(thetaDegrees % 360));
+		
+		// Gets new coordinates
+		body.x += body.vel * Math.cos(body.theta);
+		body.y += body.vel * Math.sin(body.theta);
+		
+		// FOLLOWING CODE IS FOR AI
+		// Calcultes angle at which the body needs to rotate to aim towards mouse
+		diffX = Math.abs(mouseX - body.x);
+		diffY = Math.abs(mouseY - body.y);
+		distance = pythagoras(diffX, diffY);
+		angle = Math.atan(diffY/diffX);
+		
+		// Ensures angle is between 0 and 360 rather than <= 90 in quadrants
+		if (mouseX < body.x && mouseY > body.y)
+			angle = toRadians(360 - toDegrees(angle));
+		
+		else if (mouseX > body.x && mouseY > body.y)
+			angle = toRadians(180 + toDegrees(angle));
+		
+		else if (mouseX > body.x && mouseY < body.y)
+			angle = toRadians(180 - toDegrees(angle));
+		
+
+		// Deciding easiest path of rotation (body.clockwise / antibody.clockwise)
+		option = toDegrees(body.theta) > toDegrees(angle) ? 1 : 0;
+		angleChange = option ? toDegrees(body.theta) - toDegrees(angle) : toDegrees(angle) - toDegrees(body.theta);
+		
+		if (angleChange > toDegrees(angleIncrement)){
+			if (angleChange < 360 - angleChange){
+				if (option)
+					body.theta -= angleIncrement;
+				else
+					body.theta += angleIncrement;
+			} else {
+				if (option)
+					body.theta += angleIncrement;
+				else
+					body.theta -= angleIncrement;
+			}
+		}
+	}
+	
+	// Repeats approx every 16 milliseconds
+	requestAnimationFrame(draw);
+}
+
+// Updates position of mouse
+addEventListener("mousemove", function(e){
+	coords[0] = e.pageX;
+	coords[1] = e.pageY;
+});
+
+
+/*addEventListener("touchstart", function(e){
+        e.preventDefault();
+	coords[0] = e.changedTouches[0].pageX;
+	coords[1] = e.changedTouches[0].pageY;
+});*/
+/*addEventListener("touchend", function(e){
+        e.preventDefault();
+	coords[0] = e.changedTouches[0].pageX;
+	coords[1] = e.changedTouches[0].pageY;
+});*/
+addEventListener("touchmove", function(e){
+        e.preventDefault();
+	coords[0] = e.originalEvent.touches[0].pageX || e.changedTouches[0].pageX;
+	coords[1] = e.originalEvent.touches[0].pageY || e.changedTouches[0].pageY;
+});
+
+// Start
+init();
+draw();
+</script>
+</body>
+</html>
