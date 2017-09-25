@@ -21,8 +21,9 @@ a {
 	font-family: Open Sans;
 	color: #777;
 	text-align: center;
-	width: 50%;
+	width: 60%;
 	margin: 0 auto;
+	margin-top: 40px;
 }
 
 @media screen and (max-width: 768px) {
