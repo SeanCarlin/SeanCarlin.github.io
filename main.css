@@ -16,6 +16,15 @@ a {
 	font-size: 50px;
 }
 
+.info {
+	display: block;
+	font-family: Open Sans;
+	color: #eee;
+	text-align: center;
+	width: 70%;
+	margin: 0 auto;
+}
+
 .links {
 	width: 200px;
 	margin: 80px auto 50px;
