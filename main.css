@@ -19,10 +19,16 @@ a {
 .info {
 	display: block;
 	font-family: Open Sans;
-	color: #eee;
+	color: #777;
 	text-align: center;
 	width: 70%;
 	margin: 0 auto;
+}
+
+@media screen and (max-width: 768px) {
+	.info {
+		width: 80%;
+	}
 }
 
 .links {
