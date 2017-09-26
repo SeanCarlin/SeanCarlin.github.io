@@ -1,12 +1,18 @@
 <!DOCTYPE html>
+
 <html>
 <head>
   <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width">
-  <title>JS Bin</title>
+  <title>Mandelbrot Set</title>
 <style>
-body{margin: 0;}
-canvas{display: block;}
+canvas {
+	display: block;
+	background: #fff;
+}
+
+body {
+	margin: 0;
+}
 </style>
 </head>
 <body>
@@ -15,35 +21,144 @@ canvas{display: block;}
 c.width = innerWidth;
 c.height = innerHeight;
 
-var cx = c.getContext("2d"),
-	n = c.width * c.height,
-	maxIteration = 100,
-	color = ["red", "green", "blue", "black"];
+var n = 150, iteration, run;
+var cx = c.getContext("2d");
+var graphHeight = 2.5;
+var graphWidth = getGraphWidth(graphHeight);//graphHeight/c.height*c.width;
+var centerX = graphWidth*0.55;
+var centerY = graphHeight*0.5;
+var originalCenterX = graphWidth*0.55;
+var originalCenterY = graphHeight*0.5;
+var colors = [[255,0,34], [0,0,0], [255,255,255], [6,174,213], [249,132,39]];//[[12,40,96], [0,0,0], [255,255,255]];
 
-for (var j = 0; j < c.height; j++){
-	for (var i = 0; i < c.width; i++){
-		cx.fillStyle = mandelbrot(i, j);
-		cx.fillRect(i,j,1,1);
-	}
+cx.fillStyle = "#fff";
+cx.fillRect(0,0,c.width,c.height);
+cx.fillStyle = "#000";
+
+function getGraphWidth(height){
+	return height/c.height*c.width;
 }
 
-function mandelbrot(x,y){
-	var graphX = c.width*0.7-x;
-	x0 = -(1 - -2.5)/c.width*graphX;//graphX/(c.width/2)*-3-1;
-	var graphY = c.height/2-y;
-	y0 = graphY/(c.height/2);
+
+function draw(){
+	var x, y, res, test,
+			opacity, currentColor,
+			maxDistance = pythagoras(graphWidth,graphHeight),
+			currentDistance, percentageDistance;
 	
-	var iteration = 0;
-	var x1 = 0.0, y1 = 0.0, xtemp;
-	while (x1*x1 + y1*y1 < 2*2 && iteration < maxIteration){
-		xtemp = x1*x1 - y1*y1 + x0;
-		y1 = 2*x1*y1 + y0;
-		x1 = xtemp;
-		iteration+=1;
+	for (var j = col; j < col+colDiff; j++){
+		for (var i = 0; i < c.width; i++){
+			
+			x = i/c.width * graphWidth;
+			y = j/c.height * graphHeight;
+			
+			x = x - centerX;
+			y = centerY - y;
+			
+			res = calc(x,y);
+			
+			if (res === n){
+				cx.fillStyle = "#000000";
+			} else {
+				
+				if (res/n < 1){
+					currentColor = calcColor(1,3,res/n*8);
+				}
+				
+				cx.fillStyle = "rgb("+currentColor[0]+","+currentColor[1]+","+currentColor[2]+")";
+			}
+			
+			cx.fillRect(i,j,1,1);
+		}
+	}
+	/*cx.strokeStyle = "#fff";
+	cx.beginPath();
+	cx.moveTo(c.width/2-2,0);
+	cx.lineTo(c.width/2,c.height);
+	cx.moveTo(0,c.height/2);
+	cx.lineTo(c.width,c.height/2);
+	cx.closePath();
+	cx.stroke();*/
+}
+	
+
+function calcColor(start, end, fade){
+	var dRed = colors[end][0] - colors[start][0];
+	var dGreen = colors[end][1] - colors[start][1];
+	var dBlue = colors[end][2] - colors[start][2];
+
+
+	dRed = dRed * fade + colors[start][0];
+	dGreen = dGreen * fade + colors[start][1];
+	dBlue = dBlue * fade + colors[start][2];
+
+	return [Math.floor(dRed),Math.floor(dGreen),Math.floor(dBlue)];
+}
+
+function calc(x,y){
+	var a = 0, b = 0, za, zb, iteration = 0;
+	
+	while (iteration < n){
+		za = (a*a) - (b*b) + x;
+		zb = 2*a*b + y;
+		
+		distance = pythagoras(za,zb);
+		
+		if (distance > 2){
+			return iteration;
+		}
+		
+		a = za;
+		b = zb;
+		
+		iteration++;
 	}
 	
-	return color[iteration%color.length];
+	return iteration;
 }
+
+function pythagoras(x,y){
+	return Math.sqrt(x*x + y*y);
+}
+
+addEventListener("click", function(e){
+	//move(e.pageX,e.pageY);
+});
+
+function move(x,y){
+	run = false;
+	
+	
+	
+	x = 2*originalCenterX - graphWidth*x/c.width;
+	y = 2*originalCenterY - graphHeight*y/c.height;
+	
+	centerX = x;
+	centerY = y;
+	
+	graphHeight *= 0.9;
+	graphWidth = getGraphWidth(graphHeight);
+	
+	col = 0;
+	start();
+}
+
+
+var col = 0, colDiff = 1;
+function main(){
+	draw();
+	col += colDiff;
+	
+	if (col < c.height && run)
+		requestAnimationFrame(main);
+}
+
+function start(){
+	run = true;
+	main();
+}
+
+start();
 
 </script>
 </body>
