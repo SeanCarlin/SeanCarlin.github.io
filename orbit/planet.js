@@ -33,6 +33,8 @@ function Planet(x,y,u,theta,r,m,moveable,text){
 		theta: theta
 	};
 	
+	console.log(u);
+	
 	// Gravitational Force
 	this.gForce = {
 		modulus: 0,
@@ -42,15 +44,24 @@ function Planet(x,y,u,theta,r,m,moveable,text){
 	cx.strokeStyle = "#ffffff";
 	// Draws the sphere to the canvas
 	this.draw = function(){
+		if (this.index == 2){
+			cx.strokeStyle = "#FF0000";
+			cx.fillStyle = "#FF0000";
+		}
+		else {
+			cx.strokeStyle = "#FFFFFF";
+			cx.fillStyle = "#ffffff";
+		}
 		cx.beginPath();
 		cx.arc(this.x,this.y,this.r,0,2*Math.PI);
 		
-		//cx.fillText(this.text,this.x+2,this.y-2);
+		cx.fillText(this.text,this.x+4,this.y-4);
 		cx.closePath();
 		cx.stroke();
 	};
-	
-	/* 
+}
+
+/* 
 		Ok this is the biggy. All the calculations are done here.
 		
 		Im not gonna comment in this function cus JS is interpreted and each comment would be read as the program is run
@@ -78,74 +89,58 @@ function Planet(x,y,u,theta,r,m,moveable,text){
 		
 		It adds the acceleration to the velocity to give the new rate of change of pixels
 		and finally it adds the velocity components to the x and y coordinates
-	*/
+*/
+
+
+Planet.prototype.update = function(){
+	var obj, deltaX, deltaY, accelerationX, accelerationY;
 	
-	this.update = function(){
-		var obj, deltaX, deltaY, accelerationX, accelerationY;
+	this.resultantForce.x = 0;
+	this.resultantForce.y = 0;
+	
+	for (var j = 0; j < planets.length; j++){
+		if (j != this.index){
 		
-		this.resultantForce.x = 0;
-		this.resultantForce.y = 0;
-		
-		for (var j = 0; j < planets.length; j++){
-			if (j != this.index){
+			obj = planets[j];
+			currentDistance = getDistance(obj.x-this.x,obj.y-this.y);
+			realDistance = actualDistance(currentDistance);
+
+			this.gForce.theta = Math.atan2(obj.y-this.y,obj.x-this.x);
+			this.gForce.modulus = G*(obj.m*this.m)/(realDistance*realDistance);
 			
-				obj = planets[j];
-				currentDistance = getDistance(obj.x-this.x,obj.y-this.y);
-				realDistance = actualDistance(currentDistance);
+			this.resultantForce.x += this.gForce.modulus*Math.cos(this.gForce.theta);
+			this.resultantForce.y += this.gForce.modulus*Math.sin(this.gForce.theta);
 
-				this.gForce.theta = Math.atan2(obj.y-this.y,obj.x-this.x);
-				this.gForce.modulus = G*(obj.m*this.m)/(realDistance*realDistance);
-				
-				this.resultantForce.x += this.gForce.modulus*Math.cos(this.gForce.theta);
-				this.resultantForce.y += this.gForce.modulus*Math.sin(this.gForce.theta);
-
-			}
 		}
-		
-		this.resultantForce.x += this.thrust.modulus*Math.cos(this.thrust.theta);
-		this.resultantForce.y += this.thrust.modulus*Math.sin(this.thrust.theta);
-		
-		deltaX = this.resultantForce.x - this.resultantForce.previous.x;
-		deltaY = this.resultantForce.y - this.resultantForce.previous.y;
-		
-		this.resultantForce.previous.x = this.resultantForce.x;
-		this.resultantForce.previous.y = this.resultantForce.y;
-		
-		this.thrust.modulus = getDistance(this.resultantForce.x,this.resultantForce.y);
-		this.thrust.theta = Math.atan2(this.resultantForce.y,this.resultantForce.x);
-		
-		accelerationX = screenDistance(deltaX/this.m);
-		accelerationY = screenDistance(deltaY/this.m);
-		
-		this.velocity.x += accelerationX;
-		this.velocity.y += accelerationY;
-		
-		if (this.moveable){
-			this.x += this.velocity.x;
-			this.y += this.velocity.y;
-		}
-		
-		// Genetics
-		if (this.x < c.width && this.x > 0 && this.y > 0 && this.y < c.height && getDistance(this.x-c.width/2,this.y-c.height/2) > earthRadius){
-			this.time++;
-		}
-		else {
-			this.moveable=false;
-		}
-		
-	};
-}
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+	}
+	
+	
+	if (this.time > 100000 && this.time < 100200){
+		this.thrust.modulus -= 1033000;
+	}
+	
+	
+	this.resultantForce.x += this.thrust.modulus*Math.cos(this.thrust.theta);
+	this.resultantForce.y += this.thrust.modulus*Math.sin(this.thrust.theta);
+	
+	deltaX = this.resultantForce.x - this.resultantForce.previous.x;
+	deltaY = this.resultantForce.y - this.resultantForce.previous.y;
+	
+	this.resultantForce.previous.x = this.resultantForce.x;
+	this.resultantForce.previous.y = this.resultantForce.y;
+	
+	this.thrust.modulus = getDistance(this.resultantForce.x,this.resultantForce.y);
+	this.thrust.theta = Math.atan2(this.resultantForce.y,this.resultantForce.x);
+	
+	accelerationX = screenDistance(deltaX/this.m);
+	accelerationY = screenDistance(deltaY/this.m);
+	
+	this.velocity.x += accelerationX;
+	this.velocity.y += accelerationY;
+	
+	this.x += this.velocity.x;
+	this.y += this.velocity.y;
+	
+	this.time++;
+	
+};
