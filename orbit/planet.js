@@ -55,7 +55,7 @@ function Planet(x,y,u,theta,r,m,moveable,text){
 		cx.beginPath();
 		cx.arc(this.x,this.y,this.r,0,2*Math.PI);
 		
-		cx.fillText(this.text,this.x+4,this.y-4);
+		cx.fillText(this.text,this.x+this.r,this.y-this.r);
 		cx.closePath();
 		cx.stroke();
 	};
