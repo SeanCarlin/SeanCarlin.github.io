@@ -32,13 +32,13 @@ function toDegrees(x){
 //planets.push(new Planet(c.width-10,c.height/2,0,0,0.5,1.989*Math.pow(10,30),true,"Sun"));
 
 // Earth
-planets.push(new Planet(100,c.height/2,0,0,screenDistance(earthRadius),earthMass,false,""));
+planets.push(new Planet(0.5*(innerWidth-screenDistance(384400000)),c.height/2,0,0,screenDistance(earthRadius),earthMass,false,""));
 
 // Moon
-planets.push(new Planet(100+screenDistance(384400000),c.height/2,0,0,screenDistance(1737000),moonMass,false,""));
+planets.push(new Planet(0.5*(innerWidth-screenDistance(384400000))+screenDistance(384400000),c.height/2,0,0,screenDistance(1737000),moonMass,false,""));
 
 // Rocket
-planets.push(new Planet(100,c.height/2-screenDistance(earthRadius+400000),10800*issMass,toRadians(-40.84),.1,issMass,true,""));
+planets.push(new Planet(0.5*(innerWidth-screenDistance(384400000)),c.height/2-screenDistance(earthRadius+400000),10800*issMass,toRadians(-40.84),.1,issMass,true,""));
 
 
 
