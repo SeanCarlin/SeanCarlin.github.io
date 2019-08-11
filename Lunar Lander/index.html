@@ -1,0 +1,297 @@
+<!DOCTYPE html>
+<meta name="robots" content="noindex">
+<html>
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width">
+  <title>Lunar Lander</title>
+<style>
+body{margin:0;}
+canvas{margin:0; display: block; background-color: black;}
+</style>
+</head>
+<body>
+<canvas id="c"></canvas>
+<script>
+
+
+c.width = innerWidth;
+c.height = innerHeight;
+
+var cx = c.getContext("2d");
+var g = 0.002;
+var coords = [[0,574],[1,573],[4,569],[9,564],[16,556],[20,552],[30,542],[46,528],[57,518],[80,500],[102,484],[124,470],[134,461],[157,445],[181,429],[196,422],[224,412],[242,406],[252,402],[270,400],[289,397],[310,396],[322,396],[341,396],[356,396],[364,398],[377,402],[394,409],[405,413],[428,420],[446,429],[456,433],[468,438],[474,442],[477,444],[478,444],[481,445],[482,446],[489,450],[502,456],[521,465],[530,468],[554,476],[586,484],[604,488],[634,496],[660,504],[670,505],[690,509],[714,510],[736,510],[748,512],[774,512],[796,512],[806,512],[830,512],[852,509],[862,509],[880,505],[894,501],[906,494],[913,493],[925,488],[926,488],[929,488],[930,486],[930,485],[932,484],[934,477],[942,465],[949,453],[962,432],[974,410],[980,401],[990,384],[998,369],[1006,353],[1009,348],[1017,333],[1020,321],[1022,314],[1026,302],[1030,290],[1030,282],[1033,268],[1033,257],[1034,253],[1036,248],[1036,246],[1037,246],[1038,245],[1038,244],[1040,244],[1041,244],[1042,242],[1044,242],[1045,242],[1048,241],[1050,241],[1052,241],[1053,240],[1056,240],[1057,240],[1058,240],[1060,240],[1061,240],[1064,240],[1068,240],[1073,240],[1074,240],[1077,240],[1081,240],[1082,240],[1088,240],[1092,240],[1093,240],[1097,240],[1101,241],[1104,241],[1106,242],[1110,242],[1116,244],[1118,245],[1121,246],[1124,248],[1126,249],[1129,252],[1132,254],[1137,260],[1140,262],[1149,269],[1157,277],[1164,282],[1173,292],[1185,301],[1190,308],[1200,318],[1209,326],[1217,334],[1221,340],[1229,348],[1237,356],[1240,360],[1245,365],[1246,366],[1248,366],[1253,366],[1260,366],[1262,366],[1270,366],[1274,366],[1284,366],[1292,368],[1301,372],[1308,373],[1316,374],[1326,377],[1332,378],[1342,380],[1353,382],[1357,384],[1366,385],[1374,385],[1382,386],[1386,386],[1394,388],[1401,388],[1408,388],[1410,388],[1418,388],[1420,388],[1424,388],[1428,388],[1429,388],[1432,388],[1434,388],[1436,388],[1437,388],[1444,385],[1457,378],[1465,373],[1482,362],[1497,353],[1501,350],[1512,341],[1521,336],[1530,330],[1533,326],[1541,321],[1546,317],[1549,316],[1554,314],[1560,310],[1568,309],[1572,306],[1580,305],[1588,304],[1592,304],[1597,304],[1601,304],[1604,304],[1612,304],[1617,304],[1621,305],[1629,309],[1637,314],[1640,316],[1649,322],[1656,330],[1662,337],[1665,340],[1669,345],[1676,350],[1677,353],[1682,358],[1686,365],[1688,368],[1690,373],[1694,376],[1696,380],[1697,382],[1700,389],[1704,394],[1705,397],[1705,400],[1745,480],[1746,480],[1748,480],[1749,480],[1752,480],[1753,480],[1756,480],[1758,480],[1762,480],[1764,480],[1768,480],[1772,478],[1773,478],[1774,478],[1777,478],[1778,478],[1781,478],[1782,478],[1784,478],[1785,478],[1786,478],[1788,478],[1789,478],[1792,478],[1793,478],[1794,478],[1796,478],[1797,478],[1798,478],[1800,478],[1801,478],[1802,478],[1805,478],[1806,478],[1808,478],[1810,478],[1812,478],[1813,478],[1814,478],[1816,478],[1817,478],[1818,478],[1820,478],[1820,477],[1820,476]];
+var running = true;
+var collisionParticles = 50;
+var particles = [];
+var timeAfterDeath = 50;
+
+
+cx.fillStyle = "#fff";
+cx.strokeStyle = "#fff";
+cx.lineWidth = 2;
+cx.font = "15px Arial";
+
+
+function Particle(x, y, theta){
+	this.x = x;
+	this.y = y;
+	this.vy = 0;
+	this.vel = Math.sqrt(lander.vx*lander.vx + lander.vy*lander.vy) + Math.random()*2-1;
+	this.theta = Math.PI + Math.atan2(lander.vy, lander.vx) + Math.random()-0.5;
+}
+
+Particle.prototype.update = function(){
+	this.vy += g;
+	this.x += this.vel*Math.cos(this.theta);
+	this.y += this.vel*Math.sin(this.theta) + this.vy;
+}
+
+Particle.prototype.draw = function(){
+	cx.beginPath();
+	cx.arc(this.x, this.y, 1.5, 0, 2*Math.PI);
+	cx.closePath();
+	cx.fill();
+}
+
+var lander = {
+  x: 110,
+  y: 100,
+  vx: 1.5, 
+  vy: 0,
+  fuel: 1,
+  thrust: 0.006,
+  power: false,
+  crashed: false,
+  theta: -Math.PI/2,
+  width: 10,
+  height: 10,
+  groundLocation: [10,11],
+  update: function(){
+		this.vy += g;
+		if (this.power && this.fuel > 0){
+			this.vy -= this.thrust*Math.cos(this.theta);
+			this.vx += this.thrust*Math.sin(this.theta);
+			this.fuel -= 0.0005;
+			if (this.fuel < 0)
+				this.fuel = 0;
+		}
+    this.x += this.vx;
+    this.y += this.vy;
+  },
+	collisionDetection: function(){
+		var x = this.x + this.width/2,
+				y = this.y + this.height/2,
+				groundY;
+
+		
+		if (x > coords[this.groundLocation[1]][0]){
+			this.groundLocation[0]++;
+			this.groundLocation[1]++;
+		}
+
+		else if (x < coords[this.groundLocation[0]][0]){
+			this.groundLocation[0]--;
+			this.groundLocation[1]--;
+		}
+
+		if (x < 0){
+			this.groundLocation = [coords.length, coords.length+1]
+			this.x = c.width;
+		}
+		
+		
+		groundY = terrainInterpolation(coords[this.groundLocation[0]],coords[this.groundLocation[1]],x);
+		if (y+this.height/2 > groundY[1]){
+			this.y = groundY[1] - this.height;
+
+			if (Math.abs(groundY[0]) < 2 && Math.abs(this.theta % 2*Math.PI) < 0.2 && Math.abs(this.vx) < 0.2 && Math.abs(this.vy) < 0.2){
+				running = false;
+				alert("Success!");
+			} else {
+				lander.crashed = true;
+				for (var i = 0; i < collisionParticles; i++){
+					particles.push(new Particle(lander.x, lander.y, 2*Math.PI*Math.random()));
+				}
+			}
+		}
+	},
+	flame: function(){
+		var height, width, x;
+		
+		width = 7 + Math.sin(this.fuel*1000);
+		x = -width/2;
+		
+		return [x,width];
+	},
+	getAltitude: function(){
+		return (terrainInterpolation(coords[this.groundLocation[0]],coords[this.groundLocation[1]],this.x+this.width/2)[1] - (this.y + this.height/2));
+	},
+  draw: function(){
+		cx.save();
+    cx.translate(this.x + this.width / 2, this.y + this.height / 2);
+    cx.rotate(this.theta);
+    cx.fillRect(-this.width/2,-this.height/2,this.width,this.height);
+		if (lander.power && lander.fuel > 0) {
+			cx.fillStyle = "#ffa500";
+			cx.fillRect(this.flame()[0],this.height/2,this.flame()[1],7+Math.sin(this.fuel*1000));
+			cx.fillStyle = "#ff0000";
+			cx.fillRect(-1,this.height/2,2,3)
+		}
+	cx.rotate(-this.theta);
+    cx.translate(-this.x - this.width / 2, -this.y - this.height / 2);
+	cx.restore();
+  },
+	drawData: function(){
+
+		cx.fillText("Altitude: " + this.getAltitude().toFixed(3),c.width-200,65);
+		cx.fillText("Horizontal Velocity: "+this.vx.toFixed(3), c.width-200, 80);
+		cx.fillText("Vertical Velocity: "+this.vy.toFixed(3), c.width-200, 95);
+		cx.fillText("Rotation:" + (this.theta % 2*Math.PI).toFixed(3), c.width-200,110);
+		cx.fillText("Remaining Fuel: "+this.fuel.toFixed(3), c.width-200, 125);
+		cx.font = "40px Arial";
+		cx.fillText("Lunar Lander", 100, 80);
+		cx.font = "15px Arial";
+	}
+};
+
+function terrainInterpolation(a, b, x){
+	var m, y;
+	if (b[0] !== a[0])
+		m = (b[1] - a[1])/(b[0] - a[0]);
+	else
+		m = 10;
+	
+	y = m*(x - a[0]) + a[1];
+	return [m,y];
+}
+
+
+function terrain(){
+  cx.beginPath();
+	cx.moveTo(coords[0][0],coords[0][1]);
+	for (var i = 0; i < coords.length; i++){
+		if (i > 0)
+			cx.moveTo(coords[i-1][0], coords[i-1][1]);
+		cx.lineTo(coords[i][0],coords[i][1]);
+	}
+  
+  cx.closePath();
+  cx.stroke();
+}
+
+function paintMoon(){
+	cx.fillStyle = "grey";
+
+	cx.beginPath();
+
+	for (var i = 0; i < coords.length-1; i++){
+		cx.moveTo(coords[i][0],coords[i][1]);
+		
+		if (coords[i+1][1] < coords[i][1]){
+			cx.fillRect(coords[i][0], coords[i][1], coords[i+1][0]-coords[i][0], c.height-coords[i][1]);
+			cx.lineTo(coords[i+1][0],coords[i][1]);
+			cx.lineTo(coords[i+1][0],coords[i+1][1]);
+		}
+		else{
+			cx.fillRect(coords[i][0], coords[i+1][1], coords[i+1][0]-coords[i][0], c.height-coords[i][1]);
+			cx.lineTo(coords[i][0],coords[i+1][1]);
+			cx.lineTo(coords[i+1][0],coords[i+1][1]);
+		}
+	}
+	cx.closePath();
+	cx.fill();
+	cx.fillStyle = "#FFF";
+}
+
+var starFrequency = 60;
+var starPositions = [];
+for (var i = 0; i < starFrequency; i++){
+	starPositions.push([Math.random()*c.width, Math.random()*c.height])
+}
+function stars(){
+	var star;
+	cx.beginPath();
+	for (var i = 0; i < starFrequency; i++){
+		star = starPositions[i];
+		cx.moveTo(star[0],star[1]);
+		cx.arc(star[0],star[1],1,0,2*Math.PI);
+	}
+	cx.closePath();
+	cx.fill();
+}
+
+function main(){
+  cx.clearRect(0,0,c.width,c.height);
+
+  stars();
+  
+  terrain();
+  
+  if(!lander.crashed){
+	  lander.update();
+	  lander.drawData();
+	  lander.draw();
+	  lander.collisionDetection();
+	}
+
+  if (lander.crashed){
+  	for (var i = 0; i < collisionParticles; i++){
+  		particles[i].update();
+  		particles[i].draw();
+  	}
+  }
+
+  paintMoon();
+  
+	if (running)
+		requestAnimationFrame(main);
+}
+
+window.addEventListener("keydown",function(e){
+  if (e.keyCode == 37){
+    lander.theta -= 0.2;
+  }
+  else if (e.keyCode == 39) {
+    lander.theta += 0.2;
+  } else if (e.keyCode == 32 && lander.fuel > 0) {
+		lander.power = true;
+	}
+});
+
+
+window.addEventListener("keyup",function(e){
+	if (e.keyCode == 32) {
+		lander.power = false;
+	}
+});
+
+
+///////////////////////////
+/*var coords = [],
+		capture = false;
+window.addEventListener("mousedown", function(e){
+	var x = e.clientX,
+			y = e.clientY;
+	coords.push([x,y]);
+	capture = true;
+});
+
+window.addEventListener("mouseup", function(e){
+	capture = false;
+	console.log(JSON.stringify(coords));
+});
+
+window.addEventListener("mousemove", function(e){
+	if (capture){
+		coords.push([e.clientX,e.clientY]);
+	}
+});*/
+
+main();
+
+
+
+</script>
+</body>
+</html>
