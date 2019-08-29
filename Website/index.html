@@ -1,0 +1,137 @@
+<style>
+body {
+	width: 759.4px;
+	margin: 0 auto;
+	padding-top: 10%;
+	font-family: Alef;
+	color: blue;
+	
+}
+
+p {
+	font-family: Alef;
+	font-size: 1.2em;
+}
+
+a {
+	padding: 10px;
+	text-decoration: none;
+	font-size: 1.em;
+	position: relative;
+	z-index: 0;
+	transition: 0.1s ease;
+	color: black;
+}
+
+a:hover {
+	color: blue;
+}
+
+canvas {
+	background-color: transparent;
+}
+
+table {
+	width: 100%;
+}
+td{
+	width:50%;
+}
+
+#title {
+	font-size: 3em;
+	font-family: Pacifico;
+	color: black;
+}
+
+#lin {
+	margin-left: -10px;
+}
+
+.main {
+	float: left;
+	width: 60%;
+	padding-right: 5%;
+}
+
+.main-right {
+	float: right;
+	width: 35%;
+	margin-top: 5%;
+}
+
+
+</style>
+<!DOCTYPE html>
+<meta name="robots" content="noindex">
+<html>
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width">
+  <link href="https://fonts.googleapis.com/css?family=Alef|Cinzel|Pacifico|Permanent+Marker&display=swap" rel="stylesheet">
+  <script type="text/javascript" src=script.js></script>
+<body>
+<div class="main">
+<div id="title">Sean Carlin</div>
+
+<p class="content">
+	Hi, I'm Sean. I'm a student at the University of Manchester, studying mathematics with an emphasis in statistics and mechanics.
+</p>
+<p class="content">
+	In my spare time I like to code, particularly creating HTML5 Canvas experiments in JavaScript. I have posted some of these here. All code can be found on my GitHub. 
+</p>
+<span class="content">
+	<a href="www.linkedin.com/carlinsean" id='lin'>LinkedIn</a>
+	<a href="www.github.com/seancarlin" id='git'>GitHub</a>
+	<a href="www.google.com" id='cv'>Resume</a>
+</span>
+</div>
+<div class="main-right">
+	<canvas id="c"></canvas>
+</div>
+
+
+
+<!--<table>
+    <tbody>
+		<tr>
+			<td>
+				<a href="/">Lunar Lander</a>
+			</td>
+			<td style="width=70%;">
+				A game where you attempt to land a spaceship on the lunar surface.
+			</td>
+		</tr>
+		<tr>
+			<td>
+				<a href="/">Prime Spiral</a></td>
+			</td>
+			<td>
+				Each pixel represents an integer, spirialling out from the center. Those that are prime are coloured.
+			</td>
+		</tr>
+		<tr>
+			<td>
+				<a href="/">Mandelbrot Set</a>
+			</td>
+			<td>
+				Behaviour of complex numbers under iteration represented on an Argand diagram.
+			</td>
+		</tr>
+		<tr>
+			<td>
+				<a href="/">Game of Life</a>
+			</td>
+			<td>
+				Invented by John Conway, his Game of Life explores the behaviour of populations goverened by simple rules.
+			</td>
+		</tr>
+		<td><a href="/">Orbit</a></td><td>A to scale model of a spacecraft in a translunar orbit.</td>
+		<td><a href="/">Graphing Calculator</a></td><td>Plots graphs of one independent variable. Motion can be added using t variable.</td>
+		<td><a href="/">Encrypt</a></td><td>Vigenere cipher implemented in JavaScript with a nice GUI.</td>
+		<td><a href="/">Barriers</a></td><td>A fun game. Use the space bar to dodge the incoming pipes.</td>
+		<td><a href="/">Swarm</a></td>
+	</tbody>
+</table>-->
+</body>
+</html>
