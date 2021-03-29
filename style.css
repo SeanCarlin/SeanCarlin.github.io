@@ -1,0 +1,144 @@
+
+body {
+	margin: 0;
+	font-family: "DM Sans";
+	background: #fff;
+	overflow-x: hidden;
+}
+
+a {
+	text-decoration: none;
+	color: inherit;
+}
+
+a:hover {
+	text-decoration: underline;
+}
+
+.skew {
+	transform:skew(0deg,-5deg);
+-ms-transform:skew(0deg,-10deg);
+-webkit-transform:skew(0deg,-5deg); 
+}
+
+.antiskew {
+	transform:skew(0deg,5deg);
+-ms-transform:skew(0deg,10deg);
+-webkit-transform:skew(0deg,5deg); 
+}
+
+
+#c {
+	margin: 0;
+	width: 100%;
+	height: 600px;
+	position: absolute;
+	top: 0;
+}
+
+#flag {
+	position: relative;
+	top: 5px;
+}
+
+.outerMain {
+	color: #fff;
+	background-image: linear-gradient(135deg, #9055FF, #13E2DA);
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	justify-content: space-evenly;
+	height: 600px;
+	margin-top: -70px;
+}
+
+
+.content {
+	width: 80%;
+	max-width: 1200px;
+}
+
+
+.contentHeader {
+	font-family: "Josefin Sans";
+	justify-content: space-between;
+	display: flex;
+}
+
+.right a {
+	display: inline-block;
+	margin-left: 30px;
+}
+
+.intro {
+	width: 350px;
+	font-size: 25px;
+	margin-bottom: 20px;
+	display: flex;
+	justify-content: space-between;
+}
+
+
+.profilePhoto {
+	background-image: url('profile.jpg');
+	background-size: 120px;
+	border-radius: 50%;
+	background-position: 55%;
+	flex-basis: 90px;
+	flex-grow: 0;
+	flex-shrink: 0;
+	height: 90px;
+}
+
+
+.projectInfo {
+	width: 80%;
+	max-width: 1200px;
+	margin: 50px auto;
+}
+
+.projects {
+	display: flex;
+	align-items: center;
+	width: 80%;
+	max-width: 1200px;
+	margin: 50px auto;
+	background: #fff;
+	box-shadow: rgba(50, 50, 93, 0.25) 0px 2px 5px -1px, rgba(0, 0, 0, 0.3) 0px 1px 3px -1px;
+}
+
+.projectsHeader {
+	padding: 20px;
+}
+
+.projectPhoto {
+	width: 150px;
+	height: 150px;
+	object-fit: cover;
+	background-image: linear-gradient(135deg, #9055FF, #13E2DA);
+	flex-basis: 150px;
+	flex-grow: 0;
+	flex-shrink: 0;
+}
+
+.projectTitle {
+	font-weight: 700;
+	font-size: 25px;
+	margin-bottom: 10px;
+}
+
+.projectTitle a {
+	padding: 10px;
+	position: relative;
+	left: -10px;
+}
+
+h2 {
+	font-weight: 700;
+}
+
+@media only screen and (max-width: 600px) {
+  img {
+	display:none;
+	}
+}
