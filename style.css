@@ -2,8 +2,14 @@
 body {
 	margin: 0;
 	font-family: "DM Sans";
-	background: #fff;
+	background: #fafafa;
 	overflow-x: hidden;
+}
+
+.subtle {
+	color: rgba(0,0,0,0.54);
+	display: inline-block;
+	margin-left: 10px;
 }
 
 a {
@@ -16,22 +22,22 @@ a:hover {
 }
 
 .skew {
-	transform:skew(0deg,-5deg);
--ms-transform:skew(0deg,-10deg);
--webkit-transform:skew(0deg,-5deg); 
+	transform:skew(0deg,-2.5deg);
+-ms-transform:skew(0deg,-5deg);
+-webkit-transform:skew(0deg,-2.5deg); 
 }
 
 .antiskew {
-	transform:skew(0deg,5deg);
--ms-transform:skew(0deg,10deg);
--webkit-transform:skew(0deg,5deg); 
+	transform:skew(0deg,2.5deg);
+-ms-transform:skew(0deg,5deg);
+-webkit-transform:skew(0deg,2.5deg); 
 }
 
 
 #c {
 	margin: 0;
 	width: 100%;
-	height: 600px;
+	height: 350px;
 	position: absolute;
 	top: 0;
 }
@@ -42,14 +48,19 @@ a:hover {
 }
 
 .outerMain {
-	color: #fff;
-	background-image: linear-gradient(135deg, #9055FF, #13E2DA);
+	color: #444;
+	font-weight: bold;
+	/* background-image: linear-gradient(135deg, #9055FF, #13E2DA); */
+	background-image: url('mesh.png');
+	background-size: cover;
 	display: flex;
 	flex-direction: column;
 	align-items: center;
 	justify-content: space-evenly;
-	height: 600px;
-	margin-top: -70px;
+	height: 350px;
+	padding-top: 200px;
+	position: relative;
+	top: -200px;
 }
 
 
@@ -71,7 +82,7 @@ a:hover {
 }
 
 .intro {
-	width: 350px;
+	width: 525px;
 	font-size: 25px;
 	margin-bottom: 20px;
 	display: flex;
@@ -80,7 +91,7 @@ a:hover {
 
 
 .profilePhoto {
-	background-image: url('/profile.JPG');
+	background-image: url('profile.JPG');
 	background-size: 120px;
 	border-radius: 50%;
 	background-position: 55%;
@@ -94,7 +105,7 @@ a:hover {
 .projectInfo {
 	width: 80%;
 	max-width: 1200px;
-	margin: 50px auto;
+	margin: 10px auto;
 }
 
 .projects {
@@ -104,7 +115,8 @@ a:hover {
 	max-width: 1200px;
 	margin: 50px auto;
 	background: #fff;
-	box-shadow: rgba(50, 50, 93, 0.25) 0px 2px 5px -1px, rgba(0, 0, 0, 0.3) 0px 1px 3px -1px;
+	/* box-shadow: rgba(50, 50, 93, 0.25) 0px 2px 5px -1px, rgba(0, 0, 0, 0.3) 0px 1px 3px -1px; */
+	box-shadow: rgba(99, 99, 99, 0.2) 0px 2px 8px 0px;
 }
 
 .projectsHeader {
@@ -128,7 +140,7 @@ a:hover {
 }
 
 .projectTitle a {
-	padding: 10px;
+	padding: 10px 0 10px 10px;
 	position: relative;
 	left: -10px;
 }

@@ -74,16 +74,16 @@ function main(){
 	requestAnimationFrame(main);
 }
 
-SVG.on(document, 'DOMContentLoaded', function() {
-	draw = SVG().addTo('#c').size(innerWidth, H);
-	console.log('done');
-	for(var i=0; i < N; i++){
-		points.push(new Point());
-	}
+// SVG.on(document, 'DOMContentLoaded', function() {
+// 	draw = SVG().addTo('#c').size(innerWidth, H);
+// 	console.log('done');
+// 	for(var i=0; i < N; i++){
+// 		points.push(new Point());
+// 	}
 
-	main();
+// 	main();
 
-});
+// });
 
 addEventListener("click", function(e){
 	if(e.clientY < H){
